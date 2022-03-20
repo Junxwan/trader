@@ -7,19 +7,5 @@
         mc:Ignorable="d"
         Title="交易" WindowState="Maximized" WindowStartupLocation="CenterScreen" x:Name="opwin">
 
-    <ListView ItemsSource="{Binding Path=List}">
-        <ListView.ItemsPanel>
-            <ItemsPanelTemplate>
-                <WrapPanel/>
-            </ItemsPanelTemplate>
-        </ListView.ItemsPanel>
-
-        <ListView.ItemTemplate>
-            <DataTemplate>
-                <ListViewItem Width="300" Height="auto">
-                    <local:OPTable DateText="1" PriceText="2" OPSource="{Binding Path=Calls}"/>
-                </ListViewItem>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
+    <local:ListOP OPDSource="{Binding Path=OPCAll, ElementName=opwin}"/>
 </Window>

@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:trader"
-             mc:Ignorable="d">
-    <ListView ItemsSource="{Binding Path=Value}">
+             mc:Ignorable="d" x:Name="opListView">
+
+    <ListView ItemsSource="{Binding Path=OPDSource, ElementName=opListView}">
         <ListView.ItemsPanel>
             <ItemsPanelTemplate>
                 <WrapPanel/>
@@ -15,7 +16,9 @@
         <ListView.ItemTemplate>
             <DataTemplate>
                 <ListViewItem Width="300" Height="auto">
-                    <local:OPTable DateText="{Binding Path=DateText}" PriceText="{Binding Path=PriceText}" OPSource="{Binding Path=Value}"/>
+                    <local:OPTable DateText="{Binding Path=DateText}" 
+                                   PriceText="{Binding Path=PriceText}" 
+                                   OPSource="{Binding Path=Value}"/>
                 </ListViewItem>
             </DataTemplate>
         </ListView.ItemTemplate>

@@ -7,6 +7,8 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace trader
 {
@@ -311,6 +313,18 @@ namespace trader
             this.PutMaxSubChangePerformancePrices = c[0].PerformancePrice;
             this.PutMaxAddChangePerformancePrices = c[this.Calls.Count - 1].PerformancePrice;
         }
+
+        //日期
+        public string Date()
+        {
+            return this.DateTime.ToString("MM-dd");
+        }
+
+        //週
+        public string Week()
+        {
+            return this.DateTime.ToString("ddd");
+        }
     }
 
     //某個履約價的OP未平倉
@@ -393,6 +407,56 @@ namespace trader
             }
 
             return Volume.Normal;
+        }
+    }
+
+    //Converter =========================================================================================
+
+    public class XxxConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            DataGridCell cell = (DataGridCell)value;
+            OP user = (OP)cell.DataContext;
+            int v = 0;
+            string p = (string)parameter;
+
+            if (cell.Column.DisplayIndex == 0)
+            {
+                v = user.Change;
+            }
+            else if (cell.Column.DisplayIndex == 1)
+            {
+                v = user.Total;
+            }
+
+            switch (p)
+            {
+                case "sub":
+                    return v < 0;
+                case "add":
+                    return v > 0;
+                default:
+                    return false;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class IsPerformanceConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((OP)value).IsPerformance();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 

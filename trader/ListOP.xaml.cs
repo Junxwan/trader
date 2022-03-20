@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,71 +21,62 @@ namespace trader
     /// </summary>
     public partial class ListOP : UserControl
     {
-        public OPW OPWSource
+        public List<OPDView> OPDSource
         {
             get
             {
-                return (OPW)GetValue(OPWSourceProperty);
+                return (List<OPDView>)GetValue(OPDSourceProperty);
             }
             set
             {
-                SetValue(OPWSourceProperty, value);
+                SetValue(OPDSourceProperty, value);
             }
         }
 
-        public static readonly DependencyProperty OPWSourceProperty =
-        DependencyProperty.Register("OPWSource", typeof(OPW), typeof(ListOP));
-
-        public OP.Type CP
-        {
-            get
-            {
-                return (OP.Type)GetValue(OPTypeProperty);
-            }
-            set
-            {
-                SetValue(OPTypeProperty, value);
-            }
-        }
-
-        public static readonly DependencyProperty OPTypeProperty =
-        DependencyProperty.Register("OPType", typeof(OP.Type), typeof(ListOP));
-
-        public List<OPView> Value { get; set; }
+        public static readonly DependencyProperty OPDSourceProperty =
+        DependencyProperty.Register("OPDSource", typeof(List<OPDView>), typeof(ListOP));     
 
         public ListOP()
         {
             InitializeComponent();
-            this.Value = new List<OPView>();
-
-            foreach (var item in OPWSource.Value)
-            {
-                this.Value.Add(new OPView(item, CP));
-            }
         }
     }
 
-    public class OPView
+    public class OPDView
     {
-        public string DateText { get; private set; }
+        private readonly OPD opd;
 
-        public string PriceText { get; private set; }
+        private readonly OP.Type type;
 
-        public List<OP> Value { get; private set; }
-
-        public OPView(OPD o, OP.Type cp)
+        public string DateText
         {
-            this.DateText = o.DateText;
-            this.PriceText = o.PriceText;
+            get
+            {
+                return this.opd.Date() + "(" + this.opd.Week() + ")";
+            }
+            private set { }
+        }
 
-            if (cp == OP.Type.PUT)
+        public string PriceText { get; set; } = "0";
+
+        public List<OP> Value
+        {
+            get
             {
-                this.Value = o.Puts;
+                if (this.type == OP.Type.CALL)
+                {
+                    return this.opd.Calls;
+                }
+
+                return this.opd.Puts;
             }
-            else
-            {
-                this.Value = o.Calls;
-            }
+            private set { }
+        }
+
+        public OPDView(OPD op, OP.Type t)
+        {
+            this.opd = op;
+            this.type = t;
         }
     }
 }

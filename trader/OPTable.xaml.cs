@@ -48,7 +48,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty DateTextProperty =
-         DependencyProperty.Register("DateText", typeof(string), typeof(OPTable), new PropertyMetadata("q12"));
+         DependencyProperty.Register("DateText", typeof(string), typeof(OPTable), new PropertyMetadata("0"));
 
         public string PriceText
         {
@@ -63,7 +63,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty PriceTextProperty =
-            DependencyProperty.Register("PriceText", typeof(string), typeof(OPTable));
+            DependencyProperty.Register("PriceText", typeof(string), typeof(OPTable), new PropertyMetadata("0"));
 
         public OPTable()
         {
