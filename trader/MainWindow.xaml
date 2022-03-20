@@ -1,0 +1,144 @@
+﻿<Window x:Class="trader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:trader"
+        mc:Ignorable="d"
+        Title="交易" WindowState="Maximized" WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <local:XxxConverter x:Key="xxx"/>
+        <local:IsPerformanceConverter x:Key="IsPerformanceConverter"/>
+    </Window.Resources>
+
+    <DockPanel Width="Auto" Height="Auto" LastChildFill="True">
+        <Grid Width="900" Height="900">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Rectangle Grid.Column="0" Stroke="Black" Fill="Transparent" />
+            <Rectangle Grid.Column="1" Stroke="Black" Fill="Transparent" />
+            <Rectangle Grid.Column="2" Stroke="Black" Fill="Transparent" />
+            <Rectangle Grid.Column="3" Stroke="Black" Fill="Transparent" />
+
+            <StackPanel Grid.Column="0" Background="Black">
+                <Border Background="Red" BorderThickness="0.5" BorderBrush="Black">
+                    <TextBlock Text="100/17000" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                </Border>
+
+                <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
+                    <TextBlock Text="03-16(週一)"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                </Border>
+
+                <DataGrid x:Name="datagrid" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="TextBlock.FontSize" Value="20"/>
+                            <Setter Property="TextBlock.FontWeight" Value="Bold"/>
+                            <Setter Property="Background" Value="#D0CECE"/>
+
+                            <Style.Triggers>
+                                <!--變化欄位-->
+                                <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0">
+                                    <Setter Property="Background" Value="#7B7B7B"/>
+                                </DataTrigger>
+
+                                <!--變化為負數-->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
+                                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Converter={StaticResource xxx}, ConverterParameter=sub}" Value="true"></Condition>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Foreground" Value="#C6EFCE"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+
+                                <!--變化為正數-->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
+                                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Converter={StaticResource xxx}, ConverterParameter=add}" Value="true"></Condition>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Foreground" Value="#FFC7CE"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+
+                                <!--是否履約-->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="2"></Condition>
+                                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=DataContext, Converter={StaticResource IsPerformanceConverter}}" Value="true"></Condition>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Background" Value="Red"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+
+                            </Style.Triggers>
+                        </Style>
+
+                    </DataGrid.CellStyle>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Change"  Width="45*" Binding="{Binding Change}" />
+                        <DataGridTextColumn Header="Total" Width="45*" Binding="{Binding Total}" />
+                        <DataGridTextColumn Header="IsPerformance" Width="10*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!--<ListView x:Name="liveview1" Background="Black">
+                    <ListView.Resources>
+                        <Style TargetType="GridViewColumnHeader">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </ListView.Resources>
+
+                    <ListView.ItemContainerStyle>
+                        <Style x:Name="s1" TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="中">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border BorderThickness="1" Background="Gray" BorderBrush="Black" Width="80" Height="30">
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold" FontSize="18"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="2">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border BorderThickness="1"  Background="Gray" BorderBrush="Black" Width="80" Height="30">
+                                            <TextBlock Text="{Binding Name1}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold" FontSize="18"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="3">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name2}" FontWeight="UltraBold"  FontSize="18"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>-->
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
