@@ -21,12 +21,17 @@ namespace trader
     /// </summary>
     public partial class MainWindow : Window
     {
+        public List<OPD> List { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
 
             var mag = new OPManage("G:\\我的雲端硬碟\\金融\\data\\op\\");
-            mag.Get("202203");
+            var opw = mag.Get("202203");
+            this.List = opw.Value;
+
+            this.DataContext = this;
         }
     }
 

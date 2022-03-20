@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Windows;
 
 namespace trader
 {
@@ -151,7 +152,7 @@ namespace trader
     public class OPW
     {
         //未平倉
-        private readonly SortedDictionary<DateTime, OPD> value;
+        public List<OPD> Value { get; private set; }
 
         //有開倉的履約價
         private readonly int[] performancePrices = new int[] { };
@@ -162,15 +163,14 @@ namespace trader
         public OPW(string period, FileInfo[] files)
         {
             this.period = period;
-            value = new SortedDictionary<DateTime, OPD>();
+            Value = new List<OPD>();
 
             foreach (var file in files)
             {
                 using var reader = new StreamReader(file.FullName);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                var date = DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.')));
-                var opd = new OPD(period, date, csv.GetRecords<OPCsv>(), 0);
-                value.Add(date, opd);
+                var opd = new OPD(period, DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.'))), csv.GetRecords<OPCsv>(), 0);
+                Value.Add(opd);
 
                 if (this.performancePrices.Length < opd.PerformancePrices.Length)
                 {
@@ -178,21 +178,16 @@ namespace trader
                 }
             }
 
-            int i = 0;
-            DateTime[] dt = new DateTime[value.Count];
-            foreach (var v in value.Keys)
+            foreach (var item in Value)
             {
-                dt[i] = v;
-                i++;
+                item.Fill(this.performancePrices);
             }
 
-            for (i = 1; i < value.Count; i++)
+            Value.Sort((x, y) => x.DateTime.CompareTo(y.DateTime));
+            for (int i = 1; i < Value.Count; i++)
             {
-                value[dt[i]].SetChange(value[dt[i - 1]]);
+                Value[i].SetChange(Value[i - 1]);
             }
-
-
-
         }
     }
 
@@ -204,7 +199,7 @@ namespace trader
         private readonly string period;
 
         //日期
-        private readonly DateTime dateTime;
+        public DateTime DateTime { get; private set; }
 
         //有開倉的履約價
         private readonly SortedSet<int> performancePrices;
@@ -235,10 +230,16 @@ namespace trader
         public int CallMaxSubChangePerformancePrices { get; private set; } = 0;
         public int PutMaxSubChangePerformancePrices { get; private set; } = 0;
 
+        //日期(顯示)
+        public string DateText { get; private set; }
+
+        //指數(顯示)
+        public string PriceText { get; private set; }
+
         public OPD(string period, DateTime dateTime, IEnumerable<OPCsv> csv, int price)
         {
             this.period = period;
-            this.dateTime = dateTime;
+            this.DateTime = dateTime;
             this.price = price;
             this.performancePrices = new SortedSet<int>();
             this.Calls = new List<OP>();
@@ -246,10 +247,31 @@ namespace trader
 
             foreach (var row in csv)
             {
-                this.Calls.Add(new OP(row.C, row.Price, OP.CP.CALL));
-                this.Puts.Add(new OP(row.P, row.Price, OP.CP.PUT));
+                this.Calls.Add(new OP(row.C, row.Price, OP.Type.CALL));
+                this.Puts.Add(new OP(row.P, row.Price, OP.Type.PUT));
                 this.performancePrices.Add(row.Price);
             }
+
+            this.DateText = this.DateTime.ToString("MM-dd") + "(" + this.DateTime.ToString("ddd") + ")";
+            this.PriceText = "0";
+        }
+
+        //填充履約價(空倉)
+        public void Fill(int[] performancePrices)
+        {
+            foreach (var p in performancePrices)
+            {
+                if (this.performancePrices.Contains(p))
+                {
+                    continue;
+                }
+
+                this.Calls.Add(new OP(0, p, OP.Type.CALL));
+                this.Puts.Add(new OP(0, p, OP.Type.PUT));
+            }
+
+            this.Calls.Sort((x, y) => x.PerformancePrice.CompareTo(y.PerformancePrice));
+            this.Puts.Sort((x, y) => x.PerformancePrice.CompareTo(y.PerformancePrice));
         }
 
         //設定OP未平倉變化量
@@ -289,18 +311,6 @@ namespace trader
             this.PutMaxSubChangePerformancePrices = c[0].PerformancePrice;
             this.PutMaxAddChangePerformancePrices = c[this.Calls.Count - 1].PerformancePrice;
         }
-
-        //日期
-        public string Date()
-        {
-            return this.dateTime.ToString("MM-dd");
-        }
-
-        //星期
-        public string Week()
-        {
-            return this.dateTime.ToString("ddd");
-        }
     }
 
     //某個履約價的OP未平倉
@@ -318,7 +328,7 @@ namespace trader
             Normal
         }
 
-        public enum CP
+        public enum Type
         {
             //賣權
             PUT,
@@ -339,12 +349,12 @@ namespace trader
         private readonly int performancePrice;
 
         //買賣權
-        private readonly CP cp;
+        private readonly Type cp;
 
         //是否履約
         private bool isPerformance;
 
-        public OP(int total, int performancePrice, CP cp)
+        public OP(int total, int performancePrice, Type cp)
         {
             this.cp = cp;
             this.total = total;
