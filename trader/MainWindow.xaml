@@ -9,11 +9,35 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="42*"/>
-            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="42*"/>
-            <ColumnDefinition Width="11*"/>
+            <ColumnDefinition Width="12*"/>
         </Grid.ColumnDefinitions>
 
+        <!--CALL未平倉-->
         <local:ListOP Grid.Column="0" OPDSource="{Binding Path=OPCAll, ElementName=opwin}"/>
+        <!--履約價-->
+        <StackPanel Grid.Column="1" Background="Black">
+            <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
+                <TextBlock Text="{Binding Path=Price, ElementName=opwin}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="60" Foreground="White"/>
+            </Border>
+            <DataGrid ItemsSource="{Binding Path=Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                        <Setter Property="TextBlock.FontSize" Value="18"/>
+                        <Setter Property="TextBlock.FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="#D0CECE"/>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Path=.}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+        <!--PUT未平倉-->
+        <local:ListOP Grid.Column="2" OPDSource="{Binding Path=OPPUT, ElementName=opwin}"/>
+
     </Grid>
 </Window>

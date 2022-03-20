@@ -23,14 +23,27 @@ namespace trader
     {
         public List<OPDView> OPCAll { get; set; }
 
+        public List<OPDView> OPPUT { get; set; }
+
+        public int[] Prices { get; set; } = new int[] { };
+
+        public int Price { get; set; }
+
         public MainWindow()
         {
             this.OPCAll = new List<OPDView>();
+            this.OPPUT = new List<OPDView>();
 
             var mag = new OPManage("G:\\我的雲端硬碟\\金融\\data\\op\\");
-            foreach (var item in mag.Get("202203").Page())
+            var opw = mag.Get("202203");
+
+            this.Prices = opw.PerformancePrices;
+            this.Price = 18000;
+
+            foreach (var item in opw.Page())
             {
                 this.OPCAll.Add(new OPDView(item, OP.Type.CALL));
+                this.OPPUT.Add(new OPDView(item, OP.Type.PUT));
             }
 
             this.DataContext = this;

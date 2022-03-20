@@ -157,7 +157,7 @@ namespace trader
         public List<OPD> Value { get; private set; }
 
         //有開倉的履約價
-        private readonly int[] performancePrices = new int[] { };
+        public int[] PerformancePrices { get; private set; } = new int[] { };
 
         //週別
         private string period;
@@ -174,15 +174,15 @@ namespace trader
                 var opd = new OPD(period, DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.'))), csv.GetRecords<OPCsv>(), 0);
                 Value.Add(opd);
 
-                if (this.performancePrices.Length < opd.PerformancePrices.Length)
+                if (this.PerformancePrices.Length < opd.PerformancePrices.Length)
                 {
-                    this.performancePrices = opd.PerformancePrices;
+                    this.PerformancePrices = opd.PerformancePrices;
                 }
             }
 
             foreach (var item in Value)
             {
-                item.Fill(this.performancePrices);
+                item.Fill(this.PerformancePrices);
             }
 
             Value.Sort((x, y) => x.DateTime.CompareTo(y.DateTime));

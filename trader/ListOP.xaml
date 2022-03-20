@@ -15,7 +15,7 @@
 
         <ListView.ItemTemplate>
             <DataTemplate>
-                <ListViewItem Width="150" Height="auto" Margin="-20 0 0 0">
+                <ListViewItem Width="150" Height="auto" Margin="0 0 -20 0">
                     <local:OPTable DateText="{Binding Path=DateText}" 
                                    PriceText="{Binding Path=PriceText}" 
                                    OPSource="{Binding Path=Value}"/>
