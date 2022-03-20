@@ -41,42 +41,4 @@ namespace trader
             InitializeComponent();
         }
     }
-
-    public class OPDView
-    {
-        private readonly OPD opd;
-
-        private readonly OP.Type type;
-
-        public string DateText
-        {
-            get
-            {
-                return this.opd.Date() + "(" + this.opd.Week() + ")";
-            }
-            private set { }
-        }
-
-        public string PriceText { get; set; } = "0";
-
-        public List<OP> Value
-        {
-            get
-            {
-                if (this.type == OP.Type.CALL)
-                {
-                    return this.opd.Calls;
-                }
-
-                return this.opd.Puts;
-            }
-            private set { }
-        }
-
-        public OPDView(OPD op, OP.Type t)
-        {
-            this.opd = op;
-            this.type = t;
-        }
-    }
 }

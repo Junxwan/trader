@@ -6,6 +6,14 @@
         xmlns:local="clr-namespace:trader"
         mc:Ignorable="d"
         Title="交易" WindowState="Maximized" WindowStartupLocation="CenterScreen" x:Name="opwin">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="42*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="42*"/>
+            <ColumnDefinition Width="11*"/>
+        </Grid.ColumnDefinitions>
 
-    <local:ListOP OPDSource="{Binding Path=OPCAll, ElementName=opwin}"/>
+        <local:ListOP Grid.Column="0" OPDSource="{Binding Path=OPCAll, ElementName=opwin}"/>
+    </Grid>
 </Window>

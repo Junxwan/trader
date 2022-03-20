@@ -28,7 +28,7 @@ namespace trader
             this.OPCAll = new List<OPDView>();
 
             var mag = new OPManage("G:\\我的雲端硬碟\\金融\\data\\op\\");
-            foreach (var item in mag.Get("202203").Value)
+            foreach (var item in mag.Get("202203").Page())
             {
                 this.OPCAll.Add(new OPDView(item, OP.Type.CALL));
             }

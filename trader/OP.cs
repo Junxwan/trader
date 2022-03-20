@@ -191,6 +191,11 @@ namespace trader
                 Value[i].SetChange(Value[i - 1]);
             }
         }
+
+        public List<OPD> Page()
+        {
+            return this.Value.GetRange(this.Value.Count - 6, 6);
+        }
     }
 
     //某天OP未平倉
@@ -216,7 +221,7 @@ namespace trader
         }
 
         //指數
-        private readonly int price;
+        public int Price { get; private set; }
 
         //C OP未平倉
         public List<OP> Calls { get; private set; }
@@ -232,17 +237,11 @@ namespace trader
         public int CallMaxSubChangePerformancePrices { get; private set; } = 0;
         public int PutMaxSubChangePerformancePrices { get; private set; } = 0;
 
-        //日期(顯示)
-        public string DateText { get; private set; }
-
-        //指數(顯示)
-        public string PriceText { get; private set; }
-
         public OPD(string period, DateTime dateTime, IEnumerable<OPCsv> csv, int price)
         {
             this.period = period;
             this.DateTime = dateTime;
-            this.price = price;
+            this.Price = price;
             this.performancePrices = new SortedSet<int>();
             this.Calls = new List<OP>();
             this.Puts = new List<OP>();
@@ -253,9 +252,6 @@ namespace trader
                 this.Puts.Add(new OP(row.P, row.Price, OP.Type.PUT));
                 this.performancePrices.Add(row.Price);
             }
-
-            this.DateText = this.DateTime.ToString("MM-dd") + "(" + this.DateTime.ToString("ddd") + ")";
-            this.PriceText = "0";
         }
 
         //填充履約價(空倉)
@@ -312,6 +308,36 @@ namespace trader
             c.Sort((x, y) => x.Change.CompareTo(y.Change));
             this.PutMaxSubChangePerformancePrices = c[0].PerformancePrice;
             this.PutMaxAddChangePerformancePrices = c[this.Calls.Count - 1].PerformancePrice;
+
+            foreach (var x in this.Calls)
+            {
+                if (x.PerformancePrice == this.CallMaxSubChangePerformancePrices)
+                {
+                    x.IsMaxSubChangeForDay = true;
+                    continue;
+                }
+
+                if (x.PerformancePrice == this.CallMaxAddChangePerformancePrices)
+                {
+                    x.IsMaxAddChangeForDay = true;
+                    continue;
+                }
+            }
+
+            foreach (var x in this.Puts)
+            {
+                if (x.PerformancePrice == this.PutMaxSubChangePerformancePrices)
+                {
+                    x.IsMaxSubChangeForDay = true;
+                    continue;
+                }
+
+                if (x.PerformancePrice == this.PutMaxAddChangePerformancePrices)
+                {
+                    x.IsMaxAddChangeForDay = true;
+                    continue;
+                }
+            }
         }
 
         //日期
@@ -327,21 +353,55 @@ namespace trader
         }
     }
 
+    //OP顯示的資料
+    public class OPDView
+    {
+        private readonly OPD opd;
+
+        private readonly OP.Type type;
+
+        public string DateText
+        {
+            get
+            {
+                return this.opd.Date() + "(" + this.opd.Week() + ")";
+            }
+            private set { }
+        }
+
+        public string PriceText
+        {
+            get
+            {
+                return "0/" + this.opd.Price;
+            }
+            private set { }
+        }
+
+        public List<OP> Value
+        {
+            get
+            {
+                if (this.type == OP.Type.CALL)
+                {
+                    return this.opd.Calls;
+                }
+
+                return this.opd.Puts;
+            }
+            private set { }
+        }
+
+        public OPDView(OPD op, OP.Type t)
+        {
+            this.opd = op;
+            this.type = t;
+        }
+    }
+
     //某個履約價的OP未平倉
     public class OP
     {
-        public enum Volume
-        {
-            //萬口 ro 最大量
-            MAX,
-
-            //7000口以上
-            Notice,
-
-            //7000口以下
-            Normal
-        }
-
         public enum Type
         {
             //賣權
@@ -363,14 +423,20 @@ namespace trader
         private readonly int performancePrice;
 
         //買賣權
-        private readonly Type cp;
+        public Type CP { get; private set; }
 
         //是否履約
         private bool isPerformance;
 
+        //是否為當天未平倉變化減少最多
+        public bool IsMaxSubChangeForDay;
+
+        //是否為當天未平倉變化增加最多
+        public bool IsMaxAddChangeForDay;
+
         public OP(int total, int performancePrice, Type cp)
         {
-            this.cp = cp;
+            this.CP = cp;
             this.total = total;
             this.performancePrice = performancePrice;
         }
@@ -392,27 +458,12 @@ namespace trader
         {
             return this.isPerformance;
         }
-
-        //未平倉等級
-        public Volume VolumeStatus()
-        {
-            if (this.total >= 10000)
-            {
-                return Volume.MAX;
-            }
-
-            if (this.total >= 7000)
-            {
-                return Volume.Notice;
-            }
-
-            return Volume.Normal;
-        }
     }
 
     //Converter =========================================================================================
 
-    public class XxxConverter : IValueConverter
+    //未平倉變化
+    public class TotalChangeColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -447,11 +498,54 @@ namespace trader
         }
     }
 
-    public class IsPerformanceConverter : IValueConverter
+    //是否履約
+    public class IsPerformanceColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return ((OP)value).IsPerformance();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    //未平倉
+    public class VolumeColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var op = (OP)value;
+            int.TryParse((string)parameter, out var v);
+            return op.Total >= v;
+        }
+
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    //未平倉增減
+    public class ChangeVolumeColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var op = (OP)value;
+            var t = (string)parameter;
+
+            switch (t)
+            {
+                case "IsMaxSubChangeForDay":
+                    return op.IsMaxSubChangeForDay;
+                case "IsMaxAddChangeForDay":
+                    return op.IsMaxAddChangeForDay;
+                default:
+                    return false;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
