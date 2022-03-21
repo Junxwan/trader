@@ -13,12 +13,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace trader
+namespace trader.OPS
 {
     /// <summary>
-    /// OPTable.xaml 的互動邏輯
+    /// Table.xaml 的互動邏輯
     /// </summary>
-    public partial class OPTable : UserControl
+    public partial class Table : UserControl
     {
         public List<OP> OPSource
         {
@@ -33,7 +33,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty OPSourceProperty =
-        DependencyProperty.Register("OPSource", typeof(List<OP>), typeof(OPTable), new PropertyMetadata());
+        DependencyProperty.Register("OPSource", typeof(List<OP>), typeof(Table), new PropertyMetadata());
 
         public string DateText
         {
@@ -48,7 +48,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty DateTextProperty =
-         DependencyProperty.Register("DateText", typeof(string), typeof(OPTable), new PropertyMetadata("0"));
+         DependencyProperty.Register("DateText", typeof(string), typeof(Table), new PropertyMetadata("0"));
 
         public string PriceText
         {
@@ -63,7 +63,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty PriceTextProperty =
-            DependencyProperty.Register("PriceText", typeof(string), typeof(OPTable), new PropertyMetadata("0"));
+            DependencyProperty.Register("PriceText", typeof(string), typeof(Table), new PropertyMetadata("0"));
 
         public string OPColor
         {
@@ -78,9 +78,9 @@ namespace trader
         }
 
         public static readonly DependencyProperty OPColorProperty =
-        DependencyProperty.Register("OPColor", typeof(string), typeof(OPTable), new PropertyMetadata("Black"));
+        DependencyProperty.Register("OPColor", typeof(string), typeof(Table), new PropertyMetadata("Black"));
 
-        public OPTable()
+        public Table()
         {
             InitializeComponent();
         }

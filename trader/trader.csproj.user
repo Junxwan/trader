@@ -7,21 +7,27 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="ListOP.xaml.cs">
+    <Compile Update="OPS\List.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="OPTable.xaml.cs">
+    <Compile Update="OPS\Table.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="OPS\View.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ListOP.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="OPTable.xaml">
+    <Page Update="OPS\List.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="OPS\Table.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="OPS\View.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

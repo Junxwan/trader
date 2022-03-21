@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,12 +14,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace trader
+namespace trader.OPS
 {
     /// <summary>
-    /// ListOP.xaml 的互動邏輯
+    /// List.xaml 的互動邏輯
     /// </summary>
-    public partial class ListOP : UserControl, INotifyPropertyChanged
+    public partial class List : UserControl
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -37,7 +36,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty OPDSourceProperty =
-        DependencyProperty.Register("OPDSource", typeof(List<OPDView>), typeof(ListOP));
+        DependencyProperty.Register("OPDSource", typeof(List<OPDView>), typeof(List));
 
         public string OPListColor
         {
@@ -52,7 +51,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty OPListColorProperty =
-        DependencyProperty.Register("OPListColor", typeof(string), typeof(ListOP));
+        DependencyProperty.Register("OPListColor", typeof(string), typeof(List));
 
         public string OMargin
         {
@@ -67,13 +66,7 @@ namespace trader
         }
 
         public static readonly DependencyProperty OMarginProperty =
-        DependencyProperty.Register("OMargin", typeof(string), typeof(ListOP));
-
-
-        public ListOP()
-        {
-            InitializeComponent();
-        }
+        DependencyProperty.Register("OMargin", typeof(string), typeof(List));
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -81,6 +74,11 @@ namespace trader
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        public List()
+        {
+            InitializeComponent();
         }
     }
 }

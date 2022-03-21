@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="trader.OPS.View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:trader.OPS"
+             mc:Ignorable="d" x:Name="opwin">
+
+    <Grid Background="Black">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="47.5*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="47.5*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--CALL未平倉-->
+        <local:List Grid.Column="0" x:Name="listCall" OPDSource="{Binding Path=CALL, ElementName=opwin}" OMargin="0 0 -19 0" OPListColor="Red"/>
+
+        <!--履約價-->
+        <StackPanel Grid.Column="1" Background="Black">
+            <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
+                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="50" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
+            </Border>
+            <DataGrid ItemsSource="{Binding Path=Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                        <Setter Property="TextBlock.FontSize" Value="18"/>
+                        <Setter Property="TextBlock.FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="#D0CECE"/>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Price" Width="*" Binding="{Binding Path=.}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+
+        <!--PUT未平倉-->
+        <local:List Grid.Column="2" x:Name="listPut" OPDSource="{Binding Path=PUT, ElementName=opwin}" OMargin="-19 0 0 0" OPListColor="Green"/>
+    </Grid>
+
+</UserControl>
