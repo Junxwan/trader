@@ -65,6 +65,21 @@ namespace trader
         public static readonly DependencyProperty PriceTextProperty =
             DependencyProperty.Register("PriceText", typeof(string), typeof(OPTable), new PropertyMetadata("0"));
 
+        public string OPColor
+        {
+            get
+            {
+                return (string)GetValue(OPColorProperty);
+            }
+            set
+            {
+                SetValue(OPColorProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty OPColorProperty =
+        DependencyProperty.Register("OPColor", typeof(string), typeof(OPTable), new PropertyMetadata("Black"));
+
         public OPTable()
         {
             InitializeComponent();

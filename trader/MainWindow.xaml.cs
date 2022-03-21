@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -19,36 +20,99 @@ namespace trader
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public List<OPDView> OPCAll { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public List<OPDView> OPPUT { get; set; }
+        private List<OPDView> oPCAll = new();
+        public List<OPDView> OPCAll
+        {
+            get => oPCAll;
+            set
+            {
+                oPCAll = value;
+                OnPropertyChanged("OPCAll");
+            }
+        }
 
-        public int[] Prices { get; set; } = new int[] { };
+        private List<OPDView> oPPUT = new();
+        public List<OPDView> OPPUT
+        {
+            get
+            {
+                return oPPUT;
+            }
+            set
+            {
+                oPPUT = value;
+                OnPropertyChanged("OPPUT");
+            }
+        }
 
-        public int Price { get; set; }
+        //履約價
+        private int[] prices = new int[] { };
+        public int[] Prices
+        {
+            get
+            {
+                return prices;
+            }
+            set
+            {
+                prices = value;
+                OnPropertyChanged("Prices");
+            }
+        }
+
+        private OPManage opm { get; set; }
 
         public MainWindow()
         {
-            this.OPCAll = new List<OPDView>();
-            this.OPPUT = new List<OPDView>();
+            opm = new OPManage("G:\\我的雲端硬碟\\金融\\data");
+            this.DataContext = this;
+            
+            InitializeComponent();
 
-            var mag = new OPManage("G:\\我的雲端硬碟\\金融\\data\\op\\");
-            var opw = mag.Get("202203");
+            this.selectPeriodBox.ItemsSource = opm.Periods();
+        }
 
-            this.Prices = opw.PerformancePrices;
-            this.Price = 18000;
+        private void SetOP(string period)
+        {
+            List<OPD> page;
+            var _oPCAll = new List<OPDView>();
+            var _oPPUT = new List<OPDView>();
 
-            foreach (var item in opw.Page())
+            var opw = opm.Get(period);
+            (page, this.Prices) = opw.Page();
+
+            foreach (var item in page)
             {
-                this.OPCAll.Add(new OPDView(item, OP.Type.CALL));
-                this.OPPUT.Add(new OPDView(item, OP.Type.PUT));
+                _oPCAll.Add(new OPDView(item, OP.Type.CALL));
             }
 
-            this.DataContext = this;
+            page.Reverse();
 
-            InitializeComponent();
+            foreach (var item in page)
+            {
+                _oPPUT.Add(new OPDView(item, OP.Type.PUT));
+            }
+
+            this.OPCAll = _oPCAll;
+            this.OPPUT = _oPPUT;
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var period = (string)this.selectPeriodBox.SelectedValue;
+            SetOP(period);
+        }
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

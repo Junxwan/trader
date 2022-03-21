@@ -15,7 +15,7 @@
     </UserControl.Resources>
 
     <StackPanel Background="Black">
-        <Border Background="Red" BorderThickness="0.5" BorderBrush="Black">
+        <Border Background="{Binding Path=OPColor, ElementName=opTable}" BorderThickness="0.5" BorderBrush="Black">
             <TextBlock Text="{Binding Path=PriceText, ElementName=opTable}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
         </Border>
         <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
@@ -61,7 +61,7 @@
                                 <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=DataContext, Converter={StaticResource IsPerformanceColorConverter}}" Value="true"></Condition>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
-                                <Setter Property="Background" Value="Red"/>
+                                <Setter Property="Background" Value="{Binding Path=OPColor, ElementName=opTable}"/>
                             </MultiDataTrigger.Setters>
                         </MultiDataTrigger>
                         <!--7000口以上-->

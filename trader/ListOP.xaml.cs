@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -19,8 +20,10 @@ namespace trader
     /// <summary>
     /// ListOP.xaml 的互動邏輯
     /// </summary>
-    public partial class ListOP : UserControl
+    public partial class ListOP : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public List<OPDView> OPDSource
         {
             get
@@ -34,11 +37,50 @@ namespace trader
         }
 
         public static readonly DependencyProperty OPDSourceProperty =
-        DependencyProperty.Register("OPDSource", typeof(List<OPDView>), typeof(ListOP));     
+        DependencyProperty.Register("OPDSource", typeof(List<OPDView>), typeof(ListOP));
+
+        public string OPListColor
+        {
+            get
+            {
+                return (string)GetValue(OPListColorProperty);
+            }
+            set
+            {
+                SetValue(OPListColorProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty OPListColorProperty =
+        DependencyProperty.Register("OPListColor", typeof(string), typeof(ListOP));
+
+        public string OMargin
+        {
+            get
+            {
+                return (string)GetValue(OMarginProperty);
+            }
+            set
+            {
+                SetValue(OMarginProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty OMarginProperty =
+        DependencyProperty.Register("OMargin", typeof(string), typeof(ListOP));
+
 
         public ListOP()
         {
             InitializeComponent();
+        }
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

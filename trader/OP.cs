@@ -15,17 +15,37 @@ namespace trader
     //管理OP
     public class OPManage
     {
+        //op資料目錄
         private readonly string sourceDir;
+
+        //期貨資料目錄
+        private readonly string futuresSourceDir;
 
         private SortedList<string, DirectoryInfo> periodDirs = new();
 
         private readonly SortedList<string, OPW> ops;
 
+        private SortedList<DateTime, FuturesCsv> futures = new();
+
         public OPManage(string sourceDir)
         {
-            this.sourceDir = sourceDir;
+            this.sourceDir = sourceDir + "\\op";
+            this.futuresSourceDir = sourceDir + "\\futures";
             this.ops = new SortedList<string, OPW>();
             this.LoadDirectory();
+        }
+
+        public List<string> Periods()
+        {
+            var v = new List<string>();
+            foreach (var item in this.periodDirs.Keys)
+            {
+                v.Add(item);
+            }
+
+            v.Reverse();
+
+            return v;
         }
 
         public OPW Get(string period)
@@ -35,7 +55,14 @@ namespace trader
 
             if (!ops.ContainsKey(period))
             {
-                ops[period] = new OPW(period, files[0..7]);
+                if (files.Length < 7)
+                {
+                    ops[period] = new OPW(period, files, this.futures);
+                }
+                else
+                {
+                    ops[period] = new OPW(period, files[0..7], this.futures);
+                }
             }
 
             return ops[period];
@@ -47,6 +74,14 @@ namespace trader
             {
                 var info = new DirectoryInfo(path);
                 this.periodDirs.Add(info.Name, info);
+            }
+
+            this.futures = new SortedList<DateTime, FuturesCsv>();
+            using var reader = new StreamReader(this.futuresSourceDir + "\\prices.csv");
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            foreach (var item in csv.GetRecords<FuturesCsv>())
+            {
+                this.futures.Add(item.DateTime, item);
             }
         }
 
@@ -153,6 +188,8 @@ namespace trader
     // 某一週別OP未平倉
     public class OPW
     {
+        private SortedList<DateTime, FuturesCsv> futures;
+
         //未平倉
         public List<OPD> Value { get; private set; }
 
@@ -162,16 +199,18 @@ namespace trader
         //週別
         private string period;
 
-        public OPW(string period, FileInfo[] files)
+        public OPW(string period, FileInfo[] files, SortedList<DateTime, FuturesCsv> futures)
         {
             this.period = period;
+            this.futures = futures;
             Value = new List<OPD>();
 
             foreach (var file in files)
             {
                 using var reader = new StreamReader(file.FullName);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                var opd = new OPD(period, DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.'))), csv.GetRecords<OPCsv>(), 0);
+                var date = DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.')));
+                var opd = new OPD(period, futures[date].Close, date, csv.GetRecords<OPCsv>());
                 Value.Add(opd);
 
                 if (this.PerformancePrices.Length < opd.PerformancePrices.Length)
@@ -192,9 +231,51 @@ namespace trader
             }
         }
 
-        public List<OPD> Page()
+        public (List<OPD>, int[]) Page()
         {
-            return this.Value.GetRange(this.Value.Count - 6, 6);
+            var page = new List<OPD>(this.Value);
+
+            if (page.Count < 6)
+            {
+                for (int i = 0; i < 6 - this.Value.Count; i++)
+                {
+                    page.Add(new OPD(this.period, 0, this.PerformancePrices));
+                }
+
+                page.Sort((x, y) => x.DateTime.CompareTo(y.DateTime));
+            }
+            else
+            {
+                page = page.GetRange(page.Count - 6, 6);
+            }
+
+            int maxCount = 38;
+            int max = this.PerformancePrices.Length - 1;
+            int min = 0;
+
+            if (this.PerformancePrices.Length > maxCount)
+            {
+                var p = page[page.Count - 1].Price;
+                if (p % 100 > 50)
+                {
+                    p += 100 - (p % 100);
+                }
+                else
+                {
+                    p -= p % 100;
+                }
+
+                var index = Array.IndexOf(this.PerformancePrices, p);
+                max = (index + maxCount / 2) >= this.PerformancePrices.Length ? this.PerformancePrices.Length - 1 : (index + maxCount / 2);
+                min = (index - maxCount / 2) < 0 ? 0 : index - maxCount / 2;
+
+                for (int i = 0; i < page.Count; i++)
+                {
+                    page[i] = page[i].SetRange(this.PerformancePrices[min], this.PerformancePrices[max]);
+                }
+            }
+
+            return (page, this.PerformancePrices[min..(max + 1)]);
         }
     }
 
@@ -237,7 +318,7 @@ namespace trader
         public int CallMaxSubChangePerformancePrices { get; private set; } = 0;
         public int PutMaxSubChangePerformancePrices { get; private set; } = 0;
 
-        public OPD(string period, DateTime dateTime, IEnumerable<OPCsv> csv, int price)
+        public OPD(string period, int price, DateTime dateTime, IEnumerable<OPCsv> csv)
         {
             this.period = period;
             this.DateTime = dateTime;
@@ -248,9 +329,27 @@ namespace trader
 
             foreach (var row in csv)
             {
-                this.Calls.Add(new OP(row.C, row.Price, OP.Type.CALL));
-                this.Puts.Add(new OP(row.P, row.Price, OP.Type.PUT));
+                var call = new OP(row.C, row.Price, OP.Type.CALL);
+                var put = new OP(row.P, row.Price, OP.Type.PUT);
+                call.SetPrice(price);
+                put.SetPrice(price);
+                this.Calls.Add(call);
+                this.Puts.Add(put);
                 this.performancePrices.Add(row.Price);
+            }
+        }
+
+        public OPD(string period, int price, int[] performancePrices)
+        {
+            this.period = period;
+            this.performancePrices = new SortedSet<int>();
+            this.Price = price;
+            this.Calls = new List<OP>();
+            this.Puts = new List<OP>();
+            foreach (var p in performancePrices)
+            {
+                this.Calls.Add(new OP(0, p, OP.Type.CALL));
+                this.Puts.Add(new OP(0, p, OP.Type.PUT));
             }
         }
 
@@ -264,8 +363,13 @@ namespace trader
                     continue;
                 }
 
-                this.Calls.Add(new OP(0, p, OP.Type.CALL));
-                this.Puts.Add(new OP(0, p, OP.Type.PUT));
+                var call = new OP(0, p, OP.Type.CALL);
+                var put = new OP(0, p, OP.Type.PUT);
+                call.SetPrice(this.Price);
+                put.SetPrice(this.Price);
+
+                this.Calls.Add(call);
+                this.Puts.Add(put);
             }
 
             this.Calls.Sort((x, y) => x.PerformancePrice.CompareTo(y.PerformancePrice));
@@ -351,8 +455,37 @@ namespace trader
         {
             return this.DateTime.ToString("ddd");
         }
-    }
 
+        public OPD SetRange(int min = 0, int max = 9999)
+        {
+            var opd = this.MemberwiseClone() as OPD;
+            (opd.Calls, opd.Puts) = opd.GetRange(min, max);
+            return opd;
+        }
+
+        public (List<OP>, List<OP>) GetRange(int min = 0, int max = 9999)
+        {
+            var calls = new List<OP>();
+            var puts = new List<OP>();
+            foreach (var item in this.Calls)
+            {
+                if (item.PerformancePrice >= min && item.PerformancePrice <= max)
+                {
+                    calls.Add(item);
+                }
+            }
+
+            foreach (var item in this.Puts)
+            {
+                if (item.PerformancePrice >= min && item.PerformancePrice <= max)
+                {
+                    puts.Add(item);
+                }
+            }
+
+            return (calls, puts);
+        }
+    }
     //OP顯示的資料
     public class OPDView
     {
@@ -364,6 +497,11 @@ namespace trader
         {
             get
             {
+                if (this.opd.DateTime.Year <= 1)
+                {
+                    return "";
+                }
+
                 return this.opd.Date() + "(" + this.opd.Week() + ")";
             }
             private set { }
@@ -444,7 +582,14 @@ namespace trader
         //指數價格
         public void SetPrice(int price)
         {
-            this.isPerformance = (price > this.performancePrice);
+            if (this.CP == Type.CALL)
+            {
+                this.isPerformance = (price >= this.performancePrice);
+            }
+            else
+            {
+                this.isPerformance = (price <= this.performancePrice);
+            }
         }
 
         //未平倉變化
@@ -569,6 +714,24 @@ namespace trader
         //put 未平倉
         [Index(2)]
         public int P { get; set; }
+    }
+
+    public class FuturesCsv
+    {
+        [Name("Date")]
+        public DateTime DateTime { get; set; }
+
+        [Name("Open")]
+        public int Open { get; set; }
+
+        [Name("Close")]
+        public int Close { get; set; }
+
+        [Name("High")]
+        public int High { get; set; }
+
+        [Name("Low")]
+        public int Low { get; set; }
     }
 
     //期交所每日台指OP行情 https://www.taifex.com.tw/cht/3/optDailyMarketView csv格式
