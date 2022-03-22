@@ -80,6 +80,36 @@ namespace trader.OPS
         public static readonly DependencyProperty OPColorProperty =
         DependencyProperty.Register("OPColor", typeof(string), typeof(Table), new PropertyMetadata("Black"));
 
+        public int TableOPChangeColumnIndex
+        {
+            get
+            {
+                return (int)GetValue(TableOPChangeColumnIndexProperty);
+            }
+            set
+            {
+                SetValue(TableOPChangeColumnIndexProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty TableOPChangeColumnIndexProperty =
+            DependencyProperty.Register("TableOPChangeColumnIndex", typeof(int), typeof(Table), new PropertyMetadata(0));
+
+        public int TableOPIsPerformanceColumnIndex
+        {
+            get
+            {
+                return (int)GetValue(TableOPIsPerformanceColumnIndexProperty);
+            }
+            set
+            {
+                SetValue(TableOPIsPerformanceColumnIndexProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty TableOPIsPerformanceColumnIndexProperty =
+            DependencyProperty.Register("TableOPIsPerformanceColumnIndex", typeof(int), typeof(Table), new PropertyMetadata(2));
+
         public Table()
         {
             InitializeComponent();

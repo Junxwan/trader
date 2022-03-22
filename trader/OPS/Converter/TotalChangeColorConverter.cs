@@ -18,12 +18,12 @@ namespace trader.OPS.Converter
             OP user = (OP)cell.DataContext;
             int v = 0;
             string p = (string)parameter;
-
-            if (cell.Column.DisplayIndex == 0)
+            
+            if ((string)cell.Column.Header == "Change")
             {
                 v = user.Change;
             }
-            else if (cell.Column.DisplayIndex == 1)
+            else if ((string)cell.Column.Header == "Total")
             {
                 v = user.Total;
             }

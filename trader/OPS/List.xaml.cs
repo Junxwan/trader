@@ -36,7 +36,7 @@ namespace trader.OPS
         }
 
         public static readonly DependencyProperty OPDSourceProperty =
-        DependencyProperty.Register("OPDSource", typeof(List<OPDView>), typeof(List));
+            DependencyProperty.Register("OPDSource", typeof(List<OPDView>), typeof(List));
 
         public string OPListColor
         {
@@ -51,7 +51,7 @@ namespace trader.OPS
         }
 
         public static readonly DependencyProperty OPListColorProperty =
-        DependencyProperty.Register("OPListColor", typeof(string), typeof(List));
+            DependencyProperty.Register("OPListColor", typeof(string), typeof(List));
 
         public string OMargin
         {
@@ -66,7 +66,38 @@ namespace trader.OPS
         }
 
         public static readonly DependencyProperty OMarginProperty =
-        DependencyProperty.Register("OMargin", typeof(string), typeof(List));
+            DependencyProperty.Register("OMargin", typeof(string), typeof(List));
+
+        public int ListOPChangeColumnIndex
+        {
+            get
+            {
+                return (int)GetValue(ListOPChangeColumnIndexProperty);
+            }
+            set
+            {
+                SetValue(ListOPChangeColumnIndexProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty ListOPChangeColumnIndexProperty =
+            DependencyProperty.Register("ListOPChangeColumnIndex", typeof(int), typeof(List), new PropertyMetadata(0));
+
+
+        public int ListOPIsPerformanceColumnIndex
+        {
+            get
+            {
+                return (int)GetValue(ListOPIsPerformanceColumnIndexProperty);
+            }
+            set
+            {
+                SetValue(ListOPIsPerformanceColumnIndexProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty ListOPIsPerformanceColumnIndexProperty =
+            DependencyProperty.Register("ListOPIsPerformanceColumnIndex", typeof(int), typeof(List), new PropertyMetadata(2));
 
         private void OnPropertyChanged(string propertyName)
         {

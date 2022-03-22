@@ -6,12 +6,14 @@
              xmlns:local="clr-namespace:trader.OPS"
              xmlns:c="clr-namespace:trader.OPS.Converter"
              mc:Ignorable="d" x:Name="opTable">
-    
+
     <UserControl.Resources>
         <c:TotalChangeColorConverter x:Key="TotalChangeColorConverter"/>
         <c:IsPerformanceColorConverter x:Key="IsPerformanceColorConverter"/>
         <c:VolumeColorConverter x:Key="VolumeColorConverter"/>
         <c:ChangeVolumeColorConverter x:Key="ChangeVolumeColorConverter"/>
+
+        <local:Style x:Key="Style" SOPChangeColumnIndex="{Binding Path=TableOPChangeColumnIndex, ElementName=opTable}" SOPIsPerformanceColumnIndex="{Binding Path=TableOPIsPerformanceColumnIndex, ElementName=opTable}"/>
     </UserControl.Resources>
 
     <StackPanel Background="Black">
@@ -31,13 +33,13 @@
                     <Setter Property="Background" Value="#D0CECE"/>
                     <Style.Triggers>
                         <!--變化欄位-->
-                        <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0">
+                        <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="Change">
                             <Setter Property="Background" Value="#7B7B7B"/>
                         </DataTrigger>
                         <!--變化為負數-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
+                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="Change"></Condition>
                                 <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Converter={StaticResource TotalChangeColorConverter}, ConverterParameter=sub}" Value="true"></Condition>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
@@ -47,7 +49,7 @@
                         <!--變化為正數-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
+                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="Change"></Condition>
                                 <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Converter={StaticResource TotalChangeColorConverter}, ConverterParameter=add}" Value="true"></Condition>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
@@ -57,7 +59,7 @@
                         <!--是否履約-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="2"></Condition>
+                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="IsPerformance"></Condition>
                                 <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=DataContext, Converter={StaticResource IsPerformanceColorConverter}}" Value="true"></Condition>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
@@ -89,7 +91,7 @@
                         <!--是否為當天未平倉減少最多-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
+                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="Change"></Condition>
                                 <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=DataContext, Converter={StaticResource ChangeVolumeColorConverter}, ConverterParameter=IsMaxSubChangeForDay}" Value="true"></Condition>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
@@ -100,7 +102,7 @@
                         <!--是否為當天未平倉增加最多-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
+                                <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="Change"></Condition>
                                 <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=DataContext, Converter={StaticResource ChangeVolumeColorConverter}, ConverterParameter=IsMaxAddChangeForDay}" Value="true"></Condition>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
@@ -112,9 +114,9 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Change"  Width="45*" Binding="{Binding Change}" />
-                <DataGridTextColumn Header="Total" Width="45*" Binding="{Binding Total}" />
-                <DataGridTextColumn Header="IsPerformance" Width="10*" />
+                <DataGridTextColumn Header="Change" Width="45*" Binding="{Binding Change}" DisplayIndex="{Binding Path=SOPChangeColumnIndex, Source={StaticResource Style}}" />
+                <DataGridTextColumn Header="Total" Width="45*" Binding="{Binding Total}" DisplayIndex="{Binding Path=SOPTotalColumnIndex, Source={StaticResource Style}}" />
+                <DataGridTextColumn Header="IsPerformance" Width="10*" DisplayIndex="{Binding Path=SOPIsPerformanceColumnIndex, Source={StaticResource Style}}"/>
             </DataGrid.Columns>
         </DataGrid>
     </StackPanel>

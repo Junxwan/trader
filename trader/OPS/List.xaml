@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:trader.OPS"
              mc:Ignorable="d" x:Name="opListView">
-    
+
     <ListView ItemsSource="{Binding Path=OPDSource, ElementName=opListView}">
         <ListView.ItemsPanel>
             <ItemsPanelTemplate>
@@ -19,7 +19,9 @@
                     <local:Table DateText="{Binding Path=DateText}" 
                                    PriceText="{Binding Path=PriceText}" 
                                    OPSource="{Binding Path=Value}"
-                                   OPColor="{Binding Path=OPListColor, ElementName=opListView}"/>
+                                   OPColor="{Binding Path=OPListColor, ElementName=opListView}" 
+                                   TableOPChangeColumnIndex="{Binding Path=ListOPChangeColumnIndex, ElementName=opListView}" 
+                                   TableOPIsPerformanceColumnIndex="{Binding Path=ListOPIsPerformanceColumnIndex, ElementName=opListView}"/>
                 </ListViewItem>
             </DataTemplate>
         </ListView.ItemTemplate>

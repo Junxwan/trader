@@ -14,12 +14,12 @@
         </Grid.ColumnDefinitions>
 
         <!--CALL未平倉-->
-        <local:List Grid.Column="0" x:Name="listCall" OPDSource="{Binding Path=CALL, ElementName=opwin}" OMargin="0 0 -19 0" OPListColor="Red"/>
+        <local:List Grid.Column="0" x:Name="listCall" OPDSource="{Binding Path=CALL, ElementName=opwin}" OMargin="0 0 -19 0" OPListColor="Red" ListOPChangeColumnIndex="0" ListOPIsPerformanceColumnIndex="2"/>
 
         <!--履約價-->
         <StackPanel Grid.Column="1" Background="Black">
             <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
-                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="50" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
+                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="58" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
             </Border>
             <DataGrid ItemsSource="{Binding Path=Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
@@ -28,7 +28,8 @@
                         <Setter Property="TextBlock.TextAlignment" Value="Center"/>
                         <Setter Property="TextBlock.FontSize" Value="18"/>
                         <Setter Property="TextBlock.FontWeight" Value="Bold"/>
-                        <Setter Property="Background" Value="#D0CECE"/>
+                        <Setter Property="Background" Value="Black"/>
+                        <Setter Property="Foreground" Value="White"/>
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.Columns>
@@ -38,7 +39,7 @@
         </StackPanel>
 
         <!--PUT未平倉-->
-        <local:List Grid.Column="2" x:Name="listPut" OPDSource="{Binding Path=PUT, ElementName=opwin}" OMargin="-19 0 0 0" OPListColor="Green"/>
+        <local:List Grid.Column="2" x:Name="listPut" OPDSource="{Binding Path=PUT, ElementName=opwin}" OMargin="-19 0 0 0" OPListColor="Green" ListOPChangeColumnIndex="0" ListOPIsPerformanceColumnIndex="2"/>
     </Grid>
 
 </UserControl>
