@@ -49,6 +49,12 @@ namespace trader.Futures
         //下載台指收盤資料
         public bool Download(DateTime datetime)
         {
+            //六日沒開盤
+            if (datetime.DayOfWeek == DayOfWeek.Sunday || datetime.DayOfWeek == DayOfWeek.Saturday)
+            {
+                return true;
+            }
+
             this.Load();
 
             if (this.Data.ContainsKey(datetime))
@@ -114,7 +120,7 @@ namespace trader.Futures
                 {
                     continue;
                 }
-
+               
                 data = new FuturesCsv() { Date = row.Date, Period = row.Period };
                 data.Open = Convert.ToInt32(row.Open);
                 data.Close = Convert.ToInt32(row.Close);
@@ -125,6 +131,11 @@ namespace trader.Futures
 
                 //通常第一筆就是當日行情
                 break;
+            }
+
+            if (data.Open == 0)
+            {
+                return true;
             }
 
             if (data.Settlement == 0)

@@ -79,6 +79,12 @@ namespace trader.OPS
         //下載台指OP未平倉
         public bool Download(DateTime datetime)
         {
+            //六日沒開盤
+            if (datetime.DayOfWeek == DayOfWeek.Sunday || datetime.DayOfWeek == DayOfWeek.Saturday)
+            {
+                return true;
+            }
+
             var client = new RestClient("https://www.taifex.com.tw");
             var request = new RestRequest("/cht/3/optDataDown", Method.POST);
             string date = datetime.ToString("yyyy/MM/dd");
