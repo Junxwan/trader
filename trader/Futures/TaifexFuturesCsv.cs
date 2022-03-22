@@ -29,19 +29,23 @@ namespace trader.Futures
 
         //開盤價
         [Index(3)]
-        public string Open { get; set; } = "";
+        public string Open { get; set; } = "0";
 
         //最高價
         [Index(4)]
-        public string High { get; set; } = "";
+        public string High { get; set; } = "0";
 
         //最低價
         [Index(5)]
-        public string Low { get; set; } = "";
+        public string Low { get; set; } = "0";
 
         //收盤價
         [Index(6)]
-        public string Close { get; set; } = "";
+        public string Close { get; set; } = "0";
+
+        //漲跌
+        [Index(7)]
+        public string Change { get; set; } = "0";
 
         //成交量
         [Index(9)]

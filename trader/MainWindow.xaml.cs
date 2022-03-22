@@ -18,8 +18,8 @@ namespace trader
         public MainWindow()
         {
             InitializeComponent();
-            this.OP = new OPManage(this.DataPath.Text);
             this.Futures = new Price(this.DataPath.Text + "\\futures");
+            this.OP = new OPManage(this.DataPath.Text, this.Futures);
             this.Date.SelectedDate = DateTime.Now;
         }
 

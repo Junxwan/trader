@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using trader.OPS;
+using trader.Futures;
 
 namespace trader
 {
@@ -24,7 +25,7 @@ namespace trader
 
         public OPWindow()
         {
-            OP = new OPManage("G:\\我的雲端硬碟\\金融\\data");
+            OP = new OPManage("G:\\我的雲端硬碟\\金融\\data", new Price("G:\\我的雲端硬碟\\金融\\data\\futures"));
 
             InitializeComponent();
         }

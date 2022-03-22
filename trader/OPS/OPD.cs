@@ -31,6 +31,9 @@ namespace trader.OPS
         //指數
         public int Price { get; private set; }
 
+        //指數變化
+        public int PriceChange { get; private set; }
+
         //C OP未平倉
         public List<OP> Calls { get; private set; }
 
@@ -45,11 +48,12 @@ namespace trader.OPS
         public int CallMaxSubChangePerformancePrices { get; private set; } = 0;
         public int PutMaxSubChangePerformancePrices { get; private set; } = 0;
 
-        public OPD(string period, int price, DateTime dateTime, IEnumerable<OPCsv> csv)
+        public OPD(string period, int price, int PriceChange, DateTime dateTime, IEnumerable<OPCsv> csv)
         {
             this.period = period;
             this.DateTime = dateTime;
             this.Price = price;
+            this.PriceChange = PriceChange;
             this.performancePrices = new SortedSet<int>();
             this.Calls = new List<OP>();
             this.Puts = new List<OP>();

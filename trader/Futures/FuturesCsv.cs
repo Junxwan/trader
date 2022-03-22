@@ -37,5 +37,9 @@ namespace trader.Futures
         //結算價
         [Name("Settlement")]
         public int Settlement { get; set; } = 0;
+
+        //漲跌
+        [Name("Change")]
+        public int Change { get; set; } = 0;
     }
 }

@@ -17,21 +17,18 @@ namespace trader.OPS
         //op資料目錄
         private readonly string sourceDir;
 
-        //期貨資料目錄
-        private readonly string futuresSourceDir;
-
         private SortedList<string, DirectoryInfo> periodDirs = new();
 
         public List<string> Periods { get; private set; }
 
         private readonly SortedList<string, OPW> ops;
 
-        private SortedList<DateTime, FuturesCsv> futures = new();
+        private Price futures;
 
-        public OPManage(string sourceDir)
+        public OPManage(string sourceDir, Price futures)
         {
             this.sourceDir = sourceDir + "\\op";
-            this.futuresSourceDir = sourceDir + "\\futures";
+            this.futures = futures;
             this.ops = new SortedList<string, OPW>();
             this.LoadDirectory();
             this.Periods = this.GetPeriods();
@@ -59,11 +56,11 @@ namespace trader.OPS
             {
                 if (files.Length < 7)
                 {
-                    ops[period] = new OPW(period, files, this.futures);
+                    ops[period] = new OPW(period, files, this.futures.All());
                 }
                 else
                 {
-                    ops[period] = new OPW(period, files[0..7], this.futures);
+                    ops[period] = new OPW(period, files[0..7], this.futures.All());
                 }
             }
 
@@ -77,14 +74,6 @@ namespace trader.OPS
                 var info = new DirectoryInfo(path);
                 this.periodDirs.Add(info.Name, info);
             }
-
-            //this.futures = new SortedList<DateTime, FuturesCsv>();
-            //using var reader = new StreamReader(this.futuresSourceDir + "\\prices.csv");
-            //using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            //foreach (var item in csv.GetRecords<FuturesCsv>())
-            //{
-            //    this.futures.Add(item.Date, item);
-            //}
         }
 
         //下載台指OP未平倉

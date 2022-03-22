@@ -50,7 +50,7 @@ namespace trader.Futures
         public bool Download(DateTime datetime)
         {
             this.Load();
-            
+
             if (this.Data.ContainsKey(datetime))
             {
                 return true;
@@ -121,6 +121,7 @@ namespace trader.Futures
                 data.High = Convert.ToInt32(row.High);
                 data.Low = Convert.ToInt32(row.Low);
                 data.Settlement = Convert.ToInt32(row.Settlement);
+                data.Change = Convert.ToInt32(row.Change);
 
                 //通常第一筆就是當日行情
                 break;
@@ -156,6 +157,13 @@ namespace trader.Futures
             csvw.WriteRecords(new List<FuturesCsv>() { data });
 
             return true;
+        }
+
+        //全部資料
+        public SortedList<DateTime, FuturesCsv> All()
+        {
+            this.Load();
+            return this.Data;
         }
     }
 }

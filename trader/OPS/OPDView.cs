@@ -31,7 +31,7 @@ namespace trader.OPS
         {
             get
             {
-                return "0/" + this.opd.Price;
+                return this.opd.PriceChange + "/" + this.opd.Price;
             }
             private set { }
         }
