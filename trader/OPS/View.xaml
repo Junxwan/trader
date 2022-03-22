@@ -155,7 +155,7 @@
         <!--履約價-->
         <StackPanel Grid.Column="1" Background="Black">
             <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
-                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="58" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
+                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="57" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
             </Border>
             <DataGrid ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
