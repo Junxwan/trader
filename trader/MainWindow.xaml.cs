@@ -1,20 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Forms;
 using trader.OPS;
+using trader.Futures;
 
 namespace trader
 {
@@ -23,14 +11,58 @@ namespace trader
     /// </summary>
     public partial class MainWindow : Window
     {
+        private OPManage OP;
 
-        public OPManage OP { get; set; }
+        private Price Futures;
 
         public MainWindow()
         {
-            OP = new OPManage("G:\\我的雲端硬碟\\金融\\data");
-            
             InitializeComponent();
+            this.OP = new OPManage(this.DataPath.Text);
+            this.Futures = new Price(this.DataPath.Text + "\\futures");
+            this.Date.SelectedDate = DateTime.Now;
+        }
+
+        private void Button_OPWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var op = new OPWindow();
+            op.Show();
+        }
+
+        private void Button_OpenDir_Click(object sender, RoutedEventArgs e)
+        {
+            var folder = new FolderBrowserDialog();
+            var result = folder.ShowDialog();
+            if (result.ToString() != "OK")
+            {
+                return;
+            }
+
+            this.DataPath.Text = folder.SelectedPath;
+        }
+
+        private void Button_DownloadOP_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.OP.Download(DateTime.Parse(this.Date.Text)))
+            {
+                System.Windows.MessageBox.Show("完成");
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("失敗");
+            }
+        }
+
+        private void Button_DownloadOPFutures_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.Futures.Download(DateTime.Parse(this.Date.Text)))
+            {
+                System.Windows.MessageBox.Show("完成");
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("失敗");
+            }
         }
     }
 }

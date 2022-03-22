@@ -7,7 +7,19 @@
         xmlns:op="clr-namespace:trader.OPS"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="交易" WindowState="Maximized" WindowStartupLocation="CenterScreen" x:Name="thisWin" BorderBrush="Black">
-
-    <op:View Manage="{Binding Path=OP, ElementName=thisWin}"/>
+        Title="交易" Width="800" Height="400">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="OP">
+                <MenuItem Header="未平倉" Click="Button_OPWindow_Click"/>
+            </MenuItem>
+        </Menu>
+        <Canvas>
+            <TextBox x:Name="DataPath" FontSize="18"  Width="150" Height="30" Text="G:\我的雲端硬碟\金融\data"/>
+            <Button Content="開啟" Canvas.Left="155" Canvas.Top="2" Height="26" Width="43" RenderTransformOrigin="0.07,0.501" Click="Button_OpenDir_Click"/>
+            <DatePicker x:Name="Date" FontSize="18" Width="130" Height="30" HorizontalAlignment="Center" Canvas.Top="35" VerticalAlignment="Top"/>
+            <Button Content="下載OP未平倉" Canvas.Top="70" Height="28" Width="90" Click="Button_DownloadOP_Click"/>
+            <Button Content="下載台指" Canvas.Top="70" Height="28" Width="90" Click="Button_DownloadOPFutures_Click" HorizontalAlignment="Left" Canvas.Left="95" VerticalAlignment="Center"/>
+        </Canvas>
+    </DockPanel>
 </Window>

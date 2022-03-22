@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using trader.Futures;
 
 namespace trader.OPS
 {
@@ -77,13 +78,13 @@ namespace trader.OPS
                 this.periodDirs.Add(info.Name, info);
             }
 
-            this.futures = new SortedList<DateTime, FuturesCsv>();
-            using var reader = new StreamReader(this.futuresSourceDir + "\\prices.csv");
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            foreach (var item in csv.GetRecords<FuturesCsv>())
-            {
-                this.futures.Add(item.DateTime, item);
-            }
+            //this.futures = new SortedList<DateTime, FuturesCsv>();
+            //using var reader = new StreamReader(this.futuresSourceDir + "\\prices.csv");
+            //using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            //foreach (var item in csv.GetRecords<FuturesCsv>())
+            //{
+            //    this.futures.Add(item.Date, item);
+            //}
         }
 
         //下載台指OP未平倉
@@ -161,7 +162,7 @@ namespace trader.OPS
                     list.Add(item);
                 }
 
-                string dir = sourceDir + entry.Key;
+                string dir = sourceDir + "\\" + entry.Key;
                 string date = entry.Value[0].Date.ToString("yyyy-MM-dd");
                 string file = dir + "\\" + date + ".csv";
 

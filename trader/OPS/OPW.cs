@@ -6,10 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using trader.Futures;
 
 namespace trader.OPS
 {
-
     // 某一週別OP未平倉
     public class OPW
     {
@@ -35,7 +35,7 @@ namespace trader.OPS
                 using var reader = new StreamReader(file.FullName);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
                 var date = DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.')));
-                var opd = new OPD(period, futures[date].Close, date, csv.GetRecords<OPCsv>());
+                var opd = new OPD(period, futures[date].Settlement, date, csv.GetRecords<OPCsv>());
                 Value.Add(opd);
 
                 if (this.PerformancePrices.Length < opd.PerformancePrices.Length)
