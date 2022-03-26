@@ -65,6 +65,16 @@
                         <Setter Property="Background" Value="Red"/>
                     </MultiDataTrigger.Setters>
                 </MultiDataTrigger>
+                <!--5000口以上-->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="1"></Condition>
+                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=DataContext, Converter={StaticResource VolumeColorConverter}, ConverterParameter=5000}" Value="true"></Condition>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="Foreground" Value="Red"/>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
                 <!--7000口以上-->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>

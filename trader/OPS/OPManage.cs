@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -101,6 +102,11 @@ namespace trader.OPS
             var result = (Encoding.GetEncoding(950)).GetString(resp.RawBytes);
             using var csv = new CsvReader(new StringReader(result), CultureInfo.InvariantCulture);
             return TaifexOPToCsv(csv.GetRecords<TaifexOPCsv>(), this.sourceDir);
+        }
+
+        public bool DownloadPrice(DateTime datetime)
+        {
+            return true;
         }
 
         //整理期交所每日台指OP行情csv資料 

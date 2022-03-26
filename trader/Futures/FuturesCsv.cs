@@ -10,7 +10,7 @@ namespace trader.Futures
     public class FuturesCsv
     {
         //交易日期
-        [Format("yyyy-MM-dd")]
+        [Format("yyyy/M/d")]
         [Name("Date")]
         public DateTime Date { get; set; }
 
