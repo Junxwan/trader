@@ -33,8 +33,6 @@ namespace trader
 
             opPeriods.ItemsSource = this.OP.Periods;
             opPeriods.SelectedIndex = 0;
-
-            (new trader.Futures.Transaction(this.DataPath.Text)).ToMinPriceCsv("G:\\我的雲端硬碟\\金融\\data\\futures\\transaction\\Daily_2022_04_08.csv", "202204");
         }
 
         //打開OP未平倉
@@ -98,6 +96,23 @@ namespace trader
             ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
             (new trader.OPS.Transaction(this.DataPath.Text)).ToMinPriceCsv(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
             File.Delete(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv");
+
+            System.Windows.MessageBox.Show("完成");
+        }
+
+        //產生台指 5分K
+        private void Button_Futures_TO_5MinK_Click(object sender, RoutedEventArgs e)
+        {
+            var date = DateTime.Parse(this.Date.Text).ToString("yyyy_MM_dd");
+            var file = this.DataPath.Text + "\\futures\\transaction\\Daily_" + date;
+
+            if (!File.Exists(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv"))
+            {
+                ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
+            }
+
+            (new trader.Futures.Transaction(this.DataPath.Text)).ToMinPriceCsv(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv", this.opPeriods.Text);
+            File.Delete(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv");
 
             System.Windows.MessageBox.Show("完成");
         }

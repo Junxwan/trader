@@ -69,17 +69,15 @@ namespace trader.Futures
 
 
                 vv.DateTime = vv.DateTime.AddMinutes(5 - (item.Value[0].DateTime.Minute % 5));
-                int index = 0;
                 var data = new List<MinPriceCsv>();
 
                 foreach (var v in item.Value)
                 {
-                    if (vv.DateTime <= v.DateTime || index == item.Value.Count - 1)
+                    if (vv.DateTime <= v.DateTime)
                     {
                         vv.Volume = vv.Volume / 2;
-                        var date = vv.DateTime.ToString("yyyy-MM-dd");
-
                         data.Add(vv);
+                        
                         vv = new MinPriceCsv()
                         {
                             Open = v.Price,
@@ -105,9 +103,10 @@ namespace trader.Futures
                     {
                         vv.Low = v.Price;
                     }
-
-                    index++;
                 }
+
+                vv.Volume = vv.Volume / 2;
+                data.Add(vv);
 
                 CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);
 
