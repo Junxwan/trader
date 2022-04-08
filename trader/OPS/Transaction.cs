@@ -166,13 +166,7 @@ namespace trader.OPS
                                 FileStream fs = File.Create(f);
                                 fs.Close();
                                 fs.Dispose();
-
-                                csvConfig.HasHeaderRecord = true;
-                            }
-                            else
-                            {
-                                csvConfig.HasHeaderRecord = false;
-                            }
+                            }                         
 
                             using var writer = new StreamWriter(f, false, Encoding.UTF8);
                             using var csvw = new CsvWriter(writer, csvConfig);
