@@ -35,7 +35,7 @@ namespace trader.OPS
                 using var reader = new StreamReader(file.FullName);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
                 var date = DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.')));
-                var opd = new OPD(period, futures[date].Settlement, futures[date].Change, date, csv.GetRecords<OPCsv>());
+                var opd = new OPD(period, futures[date].WSettlement > 0 ? futures[date].WSettlement : futures[date].Close, futures[date].Change, date, csv.GetRecords<OPCsv>());
                 Value.Add(opd);
 
                 if (this.PerformancePrices.Length < opd.PerformancePrices.Length)
@@ -74,7 +74,7 @@ namespace trader.OPS
                 page = page.GetRange(page.Count - 6, 6);
             }
 
-            int maxCount = 38;
+            int maxCount = 36;
             int max = this.PerformancePrices.Length - 1;
             int min = 0;
 

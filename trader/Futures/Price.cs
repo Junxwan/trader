@@ -56,7 +56,7 @@ namespace trader.Futures
             }
 
             this.Load();
-
+            
             if (this.Data.ContainsKey(datetime))
             {
                 return true;
@@ -120,7 +120,7 @@ namespace trader.Futures
                 {
                     continue;
                 }
-               
+
                 data = new FuturesCsv() { Date = row.Date, Period = row.Period };
                 data.Open = Convert.ToInt32(row.Open);
                 data.Close = Convert.ToInt32(row.Close);
@@ -138,14 +138,19 @@ namespace trader.Futures
                 return true;
             }
 
+            if (data.Date.DayOfWeek == DayOfWeek.Wednesday)
+            {
+                var v = this.DownloadSettlement(data.Date.AddMonths(-1), data.Date);
+
+                if (v != null)
+                {
+                    data.WSettlement = (int)v.Price;
+                }
+            }
+
             if (data.Settlement == 0)
             {
-                var settlement = this.DownloadSettlement(data.Date.AddMonths(-1), data.Date);
-
-                if (settlement != null)
-                {
-                    data.Settlement = (int)settlement.Price;
-                }
+                data.Settlement = data.WSettlement;
             }
 
             CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);

@@ -36,6 +36,8 @@ namespace trader.OPS
             private set { }
         }
 
+        public string TotalText { get; set; }
+
         public List<OP> Value
         {
             get
@@ -54,6 +56,24 @@ namespace trader.OPS
         {
             this.opd = op;
             this.type = t;
+            int total = 0;
+
+            if (t == OP.Type.CALL)
+            {
+                foreach (var item in op.Calls)
+                {
+                    total += item.Total;
+                }
+            }
+            else
+            {
+                foreach (var item in op.Puts)
+                {
+                    total += item.Total;
+                }
+            }
+
+            this.TotalText = total.ToString();
         }
     }
 }

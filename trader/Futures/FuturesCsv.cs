@@ -34,11 +34,15 @@ namespace trader.Futures
         [Name("Close")]
         public int Close { get; set; } = 0;
 
-        //結算價
+        //日結算價
         [Name("Settlement")]
         public int Settlement { get; set; } = 0;
 
-        //漲跌
+        //週結算價
+        [Name("WSettlement")]
+        public int WSettlement { get; set; } = 0;
+
+        //日漲跌
         [Name("Change")]
         public int Change { get; set; } = 0;
     }

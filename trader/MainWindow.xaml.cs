@@ -6,6 +6,8 @@ using trader.Futures;
 using IniParser;
 using IniParser.Model;
 using System.IO;
+using System.Threading;
+using System.IO.Compression;
 
 namespace trader
 {
@@ -28,6 +30,9 @@ namespace trader
             this.Futures = new Price(this.DataPath.Text + "\\futures");
             this.OP = new OPManage(this.DataPath.Text, this.Futures);
             this.Date.SelectedDate = DateTime.Now;
+
+            opPeriods.ItemsSource = this.OP.Periods;
+            opPeriods.SelectedIndex = 0;
         }
 
         //打開OP未平倉
@@ -80,6 +85,18 @@ namespace trader
         private void Button_Config_Save_Click(object sender, RoutedEventArgs e)
         {
             this.config.WriteData("Path", this.DataPath.Text);
+            System.Windows.MessageBox.Show("完成");
+        }
+
+        //產生OP 5分K
+        private void Button_OP_TO_5MinK_Click(object sender, RoutedEventArgs e)
+        {
+            var date = DateTime.Parse(this.Date.Text).ToString("yyyy_MM_dd");
+            var file = this.DataPath.Text + "\\op\\transaction\\OptionsDaily_" + date;
+            ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
+            (new Transaction(this.DataPath.Text)).ToMinPriceCsv(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
+            File.Delete(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv");
+
             System.Windows.MessageBox.Show("完成");
         }
     }

@@ -21,6 +21,8 @@
             <Button Content="下載OP未平倉" Canvas.Top="70" Height="28" Width="90" Click="Button_DownloadOPTotal_Click"/>
             <Button Content="下載台指" Canvas.Top="70" Height="28" Width="90" Click="Button_DownloadFutures_Click" HorizontalAlignment="Left" Canvas.Left="95" VerticalAlignment="Center"/>
             <Button Content="保存" Canvas.Left="203" Canvas.Top="2" RenderTransformOrigin="0,-1.064" HorizontalAlignment="Left" VerticalAlignment="Top" Height="26" Width="34" Click="Button_Config_Save_Click"/>
+            <Button Content="產生OP 5分K" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_OP_TO_5MinK_Click"/>
+            <ComboBox x:Name="opPeriods" Canvas.Left="140" Canvas.Top="39" Width="120" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Canvas>
     </DockPanel>
 </Window>

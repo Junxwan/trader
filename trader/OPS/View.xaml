@@ -148,12 +148,13 @@
                             <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
                                 <TextBlock Text="{Binding Path=DateText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
                             </Border>
+                            <TextBlock Text="{Binding Path=TotalText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
                             <DataGrid ItemsSource="{Binding Path=Value}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Change" Width="45*" Binding="{Binding Change}" />
-                                    <DataGridTextColumn Header="Total" Width="45*" Binding="{Binding Total}" />
-                                    <DataGridTextColumn Header="IsPerformance" Width="10*" />
+                                    <DataGridTextColumn Header="Change" Width="40*" Binding="{Binding Change}" />
+                                    <DataGridTextColumn Header="Total" Width="55*" Binding="{Binding Total}" />
+                                    <DataGridTextColumn Header="IsPerformance" Width="5*" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
@@ -165,7 +166,7 @@
         <!--履約價-->
         <StackPanel Grid.Column="1" Background="Black">
             <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
-                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="57" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
+                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="81" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
             </Border>
             <DataGrid ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
@@ -202,12 +203,13 @@
                             <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
                                 <TextBlock Text="{Binding Path=DateText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
                             </Border>
+                            <TextBlock Text="{Binding Path=TotalText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
                             <DataGrid ItemsSource="{Binding Path=Value}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="IsPerformance" Width="10*" />
-                                    <DataGridTextColumn Header="Total" Width="45*" Binding="{Binding Total}" />
-                                    <DataGridTextColumn Header="Change" Width="45*" Binding="{Binding Change}" />
+                                    <DataGridTextColumn Header="IsPerformance" Width="5*" />
+                                    <DataGridTextColumn Header="Total" Width="55*" Binding="{Binding Total}" />
+                                    <DataGridTextColumn Header="Change" Width="40*" Binding="{Binding Change}" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>

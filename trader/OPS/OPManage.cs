@@ -28,7 +28,7 @@ namespace trader.OPS
 
         public OPManage(string sourceDir, Price futures)
         {
-            this.sourceDir = sourceDir + "\\op";
+            this.sourceDir = sourceDir + "\\op\\chips";
             this.futures = futures;
             this.ops = new SortedList<string, OPW>();
             this.LoadDirectory();
