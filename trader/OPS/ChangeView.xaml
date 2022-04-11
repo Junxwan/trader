@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:trader.OPS"
              xmlns:c="clr-namespace:trader.OPS.Converter"
              mc:Ignorable="d" 
-             x:Name="opwin" Width="1920" Height="1080">
+             x:Name="opwin">
 
     <UserControl.Resources>
         <c:TotalChangeColorConverter x:Key="TotalChangeColorConverter"/>
@@ -233,7 +233,7 @@
             </Grid.RowDefinitions>
 
             <Canvas Background="Gray" Grid.Row="0">
-                <WpfPlot Name="WpfPlot1" Height="150" Width="320" />
+                <WpfPlot Name="CallPutTotalChart" Height="350" Width="1600" HorizontalAlignment="Left" VerticalAlignment="Center" />
             </Canvas>
 
             <Canvas Background="Gray" Grid.Row="1">
