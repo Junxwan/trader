@@ -26,13 +26,13 @@ namespace trader.OPS
 
         public PageData() { }
 
-        public PageData(OPW opw)
+        public PageData(OPW opw, int performance = 0)
         {
             List<OPD> data;
             var _call = new List<OPDView>();
             var _put = new List<OPDView>();
             var prices = new int[] { };
-            (data, prices) = opw.Page();
+            (data, prices) = opw.Page(performance);
 
             foreach (var item in data)
             {
@@ -85,9 +85,15 @@ namespace trader.OPS
         public static readonly DependencyProperty ManageProperty =
             DependencyProperty.Register("Manage", typeof(OPManage), typeof(View));
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_SelectionPeriodsChanged(object sender, SelectionChangedEventArgs e)
         {
             this.Page = new PageData(Manage.Get((string)this.selectPeriodBox.SelectedValue));
+            this.selectPerformanceBox.ItemsSource = this.Page.Prices;
+        }
+
+        private void ComboBox_SelectionPerformanceChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.Page = new PageData(Manage.Get((string)this.selectPeriodBox.SelectedValue), (int)this.selectPerformanceBox.SelectedValue);
         }
 
         private void OnPropertyChanged(string propertyName)

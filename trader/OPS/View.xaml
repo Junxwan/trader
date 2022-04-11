@@ -131,7 +131,7 @@
         </Grid.ColumnDefinitions>
 
         <!--CALL未平倉-->
-        <ListView ItemsSource="{Binding Path=Page.CALL, ElementName=opwin}" Grid.Column="0">
+        <ListView x:Name="callListView" ItemsSource="{Binding Path=Page.CALL, ElementName=opwin}" Grid.Column="0">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel/>
@@ -149,7 +149,7 @@
                                 <TextBlock Text="{Binding Path=DateText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
                             </Border>
                             <TextBlock Text="{Binding Path=TotalText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                            <DataGrid ItemsSource="{Binding Path=Value}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+                            <DataGrid x:Name="callDataGrid" SelectionMode="Extended" ItemsSource="{Binding Path=Value}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Change" Width="40*" Binding="{Binding Change}" />
@@ -166,7 +166,7 @@
         <!--履約價-->
         <StackPanel Grid.Column="1" Background="Black">
             <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
-                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="81" FontSize="14" SelectionChanged="ComboBox_SelectionChanged"/>
+                <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="81" FontSize="14" SelectionChanged="ComboBox_SelectionPeriodsChanged"/>
             </Border>
             <DataGrid ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
@@ -183,16 +183,17 @@
                     <DataGridTextColumn Header="Price" Width="*" Binding="{Binding Path=.}" />
                 </DataGrid.Columns>
             </DataGrid>
+            <ComboBox x:Name="selectPerformanceBox" Text="履約價" Height="30" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceChanged"/>
         </StackPanel>
 
         <!--PUT未平倉-->
-        <ListView ItemsSource="{Binding Path=Page.PUT, ElementName=opwin}" Grid.Column="2">
+        <ListView x:Name="putListView" ItemsSource="{Binding Path=Page.PUT, ElementName=opwin}" Grid.Column="2">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel/>
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
-
+       
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ListViewItem Width="170" Height="auto" Margin="-15 0 -4 0">
@@ -204,7 +205,7 @@
                                 <TextBlock Text="{Binding Path=DateText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
                             </Border>
                             <TextBlock Text="{Binding Path=TotalText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                            <DataGrid ItemsSource="{Binding Path=Value}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+                            <DataGrid ItemsSource="{Binding Path=Value}" SelectionMode="Extended" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="IsPerformance" Width="5*" />

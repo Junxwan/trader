@@ -56,7 +56,7 @@ namespace trader.OPS
             }
         }
 
-        public (List<OPD>, int[]) Page()
+        public (List<OPD>, int[]) Page(int performance = 0)
         {
             var page = new List<OPD>(this.Value);
 
@@ -75,29 +75,41 @@ namespace trader.OPS
             }
 
             int maxCount = 36;
-            int max = this.PerformancePrices.Length - 1;
+            int max = 0;
             int min = 0;
 
-            if (this.PerformancePrices.Length > maxCount)
+            if (performance == 0)
             {
-                var p = page[page.Count - 1].Price;
-                if (p % 100 > 50)
-                {
-                    p += 100 - (p % 100);
-                }
-                else
-                {
-                    p -= p % 100;
-                }
+                max = this.PerformancePrices.Length - 1;
+                min = 0;
 
-                var index = Array.IndexOf(this.PerformancePrices, p);
-                max = (index + maxCount / 2) >= this.PerformancePrices.Length ? this.PerformancePrices.Length - 1 : (index + maxCount / 2);
-                min = (index - maxCount / 2) < 0 ? 0 : index - maxCount / 2;
-
-                for (int i = 0; i < page.Count; i++)
+                if (this.PerformancePrices.Length > maxCount)
                 {
-                    page[i] = page[i].SetRange(this.PerformancePrices[min], this.PerformancePrices[max]);
+                    var p = page[page.Count - 1].Price;
+                    if (p % 100 > 50)
+                    {
+                        p += 100 - (p % 100);
+                    }
+                    else
+                    {
+                        p -= p % 100;
+                    }
+
+                    var index = Array.IndexOf(this.PerformancePrices, p);
+                    max = (index + maxCount / 2) >= this.PerformancePrices.Length ? this.PerformancePrices.Length - 1 : (index + maxCount / 2);
+                    min = (index - maxCount / 2) < 0 ? 0 : index - maxCount / 2;
                 }
+            }
+            else
+            {
+                var index = Array.IndexOf(this.PerformancePrices, performance);
+                min = index - maxCount / 2;
+                max = index + maxCount / 2;
+            }
+
+            for (int i = 0; i < page.Count; i++)
+            {
+                page[i] = page[i].SetRange(this.PerformancePrices[min], this.PerformancePrices[max]);
             }
 
             return (page, this.PerformancePrices[min..(max + 1)]);
