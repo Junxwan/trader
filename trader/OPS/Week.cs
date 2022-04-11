@@ -56,11 +56,22 @@ namespace trader.OPS
             }
         }
 
-        public (List<Day>, int[]) Page(int performance = 0)
+        public (List<Day>, int[]) Page(int performance = 0, string date = "")
         {
             var page = new List<Day>(this.Value);
 
-            if (page.Count < 6)
+            if (date != "")
+            {
+                foreach (Day day in page)
+                {
+                    if (day.DateTime.ToString("yyyy-MM-dd") == date)
+                    {
+                        page = new List<Day>() { day };
+                        break;
+                    }
+                }
+            }
+            else if (page.Count < 6)
             {
                 for (int i = 0; i < 6 - this.Value.Count; i++)
                 {

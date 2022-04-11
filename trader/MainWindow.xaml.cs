@@ -42,6 +42,13 @@ namespace trader
             op.Show();
         }
 
+        //打開OP當日未平倉變化
+        private void Button_OPChangeWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var op = new OPChangeWindow();
+            op.Show();
+        }
+
         //選擇資料目錄
         private void Button_OpenDataDir_Click(object sender, RoutedEventArgs e)
         {

@@ -17,9 +17,9 @@ using System.Windows.Shapes;
 namespace trader.OPS
 {
     /// <summary>
-    /// View.xaml 的互動邏輯
+    /// ChangeView.xaml 的互動邏輯
     /// </summary>
-    public partial class View : UserControl, INotifyPropertyChanged
+    public partial class ChangeView : UserControl, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -47,17 +47,34 @@ namespace trader.OPS
         }
 
         public static readonly DependencyProperty ManageProperty =
-            DependencyProperty.Register("Manage", typeof(Manage), typeof(View));
+            DependencyProperty.Register("Manage", typeof(Manage), typeof(ChangeView));
 
         private void ComboBox_SelectionPeriodsChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.Page = new PageData(Manage.Get((string)this.selectPeriodBox.SelectedValue));
-            this.selectPerformanceBox.ItemsSource = this.Page.Prices;
+            var week = Manage.Get((string)this.selectPeriodBox.SelectedValue);
+            this.datePicker.SelectedDate = week.Value[week.Value.Count - 1].DateTime;
         }
 
         private void ComboBox_SelectionPerformanceChanged(object sender, SelectionChangedEventArgs e)
         {
             this.Page = new PageData(Manage.Get((string)this.selectPeriodBox.SelectedValue), (int)this.selectPerformanceBox.SelectedValue);
+        }
+
+        private void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int performance = 0;
+            if (this.selectPerformanceBox.SelectedValue != null)
+            {
+                performance = (int)this.selectPerformanceBox.SelectedValue;
+            }
+
+            this.Page = new PageData(
+                Manage.Get((string)this.selectPeriodBox.SelectedValue),
+                performance,
+                DateTime.Parse(this.datePicker.Text).ToString("yyyy-MM-dd")
+                );
+
+            this.selectPerformanceBox.ItemsSource = this.Page.Prices;
         }
 
         private void OnPropertyChanged(string propertyName)
@@ -68,7 +85,7 @@ namespace trader.OPS
             }
         }
 
-        public View()
+        public ChangeView()
         {
             InitializeComponent();
         }

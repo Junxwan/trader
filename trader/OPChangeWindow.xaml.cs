@@ -11,19 +11,19 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using trader.OPS;
 using trader.Futures;
+using trader.OPS;
 
 namespace trader
 {
     /// <summary>
-    /// OPWindow.xaml 的互動邏輯
+    /// OPChangeWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class OPWindow : Window
+    public partial class OPChangeWindow : Window
     {
         public Manage OP { get; set; }
 
-        public OPWindow()
+        public OPChangeWindow()
         {
             var dataPath = (new Config()).GetData("Path");
             OP = new Manage(dataPath, new Price(dataPath + "\\futures"));

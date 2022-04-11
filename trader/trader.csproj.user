@@ -9,6 +9,12 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="OPChangeWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="OPS\ChangeView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="OPS\View.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -18,6 +24,12 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="OPChangeWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="OPS\ChangeView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="OPS\View.xaml">
