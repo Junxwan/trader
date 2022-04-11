@@ -103,6 +103,7 @@ namespace trader.OPS
             this.selectPutPerformanceSupportBox.ItemsSource = this.Page.Prices;
 
             DrawCallPutTotalChart();
+            DrawCallPutChangeChart();
         }
 
         private void OnPropertyChanged(string propertyName)
@@ -167,6 +168,41 @@ namespace trader.OPS
             CallPutTotalChart.Plot.XAxis.Color(System.Drawing.Color.White);
             CallPutTotalChart.Plot.YAxis.Color(System.Drawing.Color.White);
             CallPutTotalChart.Refresh();
+        }
+
+        private void DrawCallPutChangeChart()
+        {
+            var callTotal = new List<double>();
+            var putTotal = new List<double>();
+
+            foreach (var item in this.page.CALL[0].Value)
+            {
+                callTotal.Add(item.Change);
+            }
+
+            foreach (var item in this.page.PUT[0].Value)
+            {
+                putTotal.Add(item.Change);
+            }
+
+            putTotal.Reverse();
+
+            CallPutChangeChart.Plot.Clear();
+            double[] positions = DataGen.Consecutive(this.Page.Prices.Length);
+            CallPutChangeChart.Plot.AddScatter(positions, callTotal.ToArray(), label: "Call", color: System.Drawing.Color.Red);
+            CallPutChangeChart.Plot.AddScatter(positions, putTotal.ToArray(), label: "Put", color: System.Drawing.Color.Green);
+
+            string[] labels = this.Page.Prices.Select(x => x.ToString()).ToArray();
+            CallPutChangeChart.Plot.XAxis.ManualTickPositions(positions, labels);
+            CallPutChangeChart.Plot.AddHorizontalLine(0, color: System.Drawing.Color.White);
+            CallPutChangeChart.Plot.Title("Call/Put未平倉增減");
+            CallPutChangeChart.Plot.XLabel("履約價");
+            CallPutChangeChart.Plot.Title("未平倉增減");
+            CallPutChangeChart.Plot.Legend();
+            CallPutChangeChart.Plot.Style(ScottPlot.Style.Gray2);
+            CallPutChangeChart.Plot.XAxis.Color(System.Drawing.Color.White);
+            CallPutChangeChart.Plot.YAxis.Color(System.Drawing.Color.White);
+            CallPutChangeChart.Refresh();
         }
 
         public ChangeView()

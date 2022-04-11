@@ -234,6 +234,7 @@
 
             <Canvas Background="Gray" Grid.Row="0">
                 <WpfPlot Name="CallPutTotalChart" Height="350" Width="1600" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <WpfPlot Name="CallPutChangeChart" Height="350" Width="1600" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="350" />
             </Canvas>
 
             <Canvas Background="Gray" Grid.Row="1">
