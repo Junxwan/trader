@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:trader.OPS"
              xmlns:c="clr-namespace:trader.OPS.Converter"
              mc:Ignorable="d" 
-             x:Name="opwin">
+             x:Name="opwin" Width="1920" Height="1080">
 
     <UserControl.Resources>
         <c:TotalChangeColorConverter x:Key="TotalChangeColorConverter"/>
@@ -147,7 +147,7 @@
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <ListViewItem Width="160" Height="auto" Margin="0 0 -19 0">
+                        <ListViewItem Width="170" Height="auto" Margin="0 0 -19 0">
                             <StackPanel Background="Black">
                                 <Border Background="Red" BorderThickness="0.5" BorderBrush="Black">
                                     <TextBlock Text="{Binding Path=PriceText}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
@@ -175,7 +175,7 @@
                 <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
                     <Label Height="81" Background="Black"/>
                 </Border>
-                <DataGrid ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+                <DataGrid x:Name="pricesDataGrid" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
                     <DataGrid.CellStyle>
                         <Style TargetType="DataGridCell">
@@ -187,7 +187,7 @@
                         </Style>
                     </DataGrid.CellStyle>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Price" Width="*" Binding="{Binding Path=.}" />
+                        <DataGridTextColumn Header="Price" Width="90*" Binding="{Binding Path=.}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>
@@ -202,7 +202,7 @@
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <ListViewItem Width="160" Height="auto" Margin="-15 0 -4 0">
+                        <ListViewItem Width="170" Height="auto" Margin="-15 0 -4 0">
                             <StackPanel Background="Black">
                                 <Border Background="Green" BorderThickness="0.5" BorderBrush="Black">
                                     <TextBlock Text="{Binding Path=PriceText}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
@@ -232,7 +232,10 @@
                 <RowDefinition Height="20*"/>
             </Grid.RowDefinitions>
 
-            <Border Background="Gray" Grid.Row="0"/>
+            <Canvas Background="Gray" Grid.Row="0">
+                <WpfPlot Name="WpfPlot1" Height="150" Width="320" />
+            </Canvas>
+
             <Canvas Background="Gray" Grid.Row="1">
                 <ComboBox ItemsSource="{Binding Path=Manage.Periods, ElementName=opwin}" x:Name="selectPeriodBox" Text="週別" Height="25" Width="105" FontSize="14" SelectionChanged="ComboBox_SelectionPeriodsChanged" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="55" Canvas.Top="5"/>
                 <Label Content="週期:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"/>
@@ -240,6 +243,10 @@
                 <DatePicker x:Name="datePicker" Canvas.Left="55" Canvas.Top="35" HorizontalAlignment="Left" VerticalAlignment="Center" Width="115" FontSize="15" SelectedDateChanged="datePicker_SelectedDateChanged"/>
                 <ComboBox x:Name="selectPerformanceBox" Text="履約價" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="55" Canvas.Top="66" HorizontalAlignment="Center" VerticalAlignment="Center" Width="105"/>
                 <Label Content="履約:" FontSize="20" RenderTransformOrigin="0.549,1.271" Canvas.Top="61" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label Content="Call壓力:" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="189" Canvas.Top="5"/>
+                <ComboBox x:Name="selectCallPerformanceSupportBox" Text="Call壓力" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceSupportChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="8" Width="105" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Label Content="Put支撐:" FontSize="20" Canvas.Left="189" Canvas.Top="49" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectPutPerformanceSupportBox" Text="Put支撐" Height="24" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceSupportChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="54" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             </Canvas>
         </Grid>
     </Grid>

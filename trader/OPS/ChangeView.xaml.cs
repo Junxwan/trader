@@ -60,6 +60,29 @@ namespace trader.OPS
             this.Page = new PageData(Manage.Get((string)this.selectPeriodBox.SelectedValue), (int)this.selectPerformanceBox.SelectedValue);
         }
 
+        private void ComboBox_SelectionPerformanceSupportChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index = 0;
+            foreach (var item in this.pricesDataGrid.Items)
+            {
+                var row = ((DataGridRow)this.pricesDataGrid.ItemContainerGenerator.ContainerFromIndex(index));
+                if (this.selectCallPerformanceSupportBox.SelectedValue != null && (int)item >= (int)this.selectCallPerformanceSupportBox.SelectedValue)
+                {
+                    row.Background = Brushes.DarkRed;
+                }
+                else if (this.selectPutPerformanceSupportBox.SelectedValue != null && (int)item <= (int)this.selectPutPerformanceSupportBox.SelectedValue)
+                {
+                    row.Background = Brushes.DarkGreen;
+                }
+                else
+                {
+                    row.Background = Brushes.White;
+                }
+
+                index++;
+            }
+        }
+
         private void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             int performance = 0;
@@ -75,6 +98,8 @@ namespace trader.OPS
                 );
 
             this.selectPerformanceBox.ItemsSource = this.Page.Prices;
+            this.selectCallPerformanceSupportBox.ItemsSource = this.Page.Prices;
+            this.selectPutPerformanceSupportBox.ItemsSource = this.Page.Prices;
         }
 
         private void OnPropertyChanged(string propertyName)
