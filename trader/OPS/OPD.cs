@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using trader.OPS.Csv;
 
 namespace trader.OPS
 {
@@ -48,7 +49,7 @@ namespace trader.OPS
         public int CallMaxSubChangePerformancePrices { get; private set; } = 0;
         public int PutMaxSubChangePerformancePrices { get; private set; } = 0;
 
-        public OPD(string period, int price, int PriceChange, DateTime dateTime, IEnumerable<OPCsv> csv)
+        public OPD(string period, int price, int PriceChange, DateTime dateTime, IEnumerable<Csv.OP> csv)
         {
             this.period = period;
             this.DateTime = dateTime;

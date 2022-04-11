@@ -1,13 +1,13 @@
-﻿using System;
+﻿using CsvHelper.Configuration.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CsvHelper.Configuration.Attributes;
 
-namespace trader.OPS
+namespace trader.OPS.Csv
 {
-    public class TransactionCsv
+    public class Transaction
     {
         //交易日期
         [Index(0)]
@@ -27,7 +27,7 @@ namespace trader.OPS
 
         //買賣權
         [Index(4)]
-        public string Cp  { get; set; }
+        public string Cp { get; set; }
 
         //成交時間
         [Index(5)]

@@ -101,7 +101,7 @@ namespace trader.OPS
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             var result = (Encoding.GetEncoding(950)).GetString(resp.RawBytes);
             using var csv = new CsvReader(new StringReader(result), CultureInfo.InvariantCulture);
-            return TaifexOPToCsv(csv.GetRecords<TaifexOPCsv>(), this.sourceDir);
+            return TaifexOPToCsv(csv.GetRecords<Csv.TaifexOP>(), this.sourceDir);
         }
 
         public bool DownloadPrice(DateTime datetime)
@@ -110,9 +110,9 @@ namespace trader.OPS
         }
 
         //整理期交所每日台指OP行情csv資料 
-        private static bool TaifexOPToCsv(IEnumerable<TaifexOPCsv> csv, string sourceDir)
+        private static bool TaifexOPToCsv(IEnumerable<Csv.TaifexOP> csv, string sourceDir)
         {
-            var ops = new Dictionary<string, List<TaifexOPCsv>>();
+            var ops = new Dictionary<string, List<Csv.TaifexOP>>();
 
             foreach (var row in csv)
             {
@@ -123,23 +123,23 @@ namespace trader.OPS
 
                 if (!ops.ContainsKey(row.Period))
                 {
-                    ops[row.Period] = new List<TaifexOPCsv>();
+                    ops[row.Period] = new List<Csv.TaifexOP>();
                 }
 
                 ops[row.Period].Add(row);
             }
 
-            foreach (KeyValuePair<string, List<TaifexOPCsv>> entry in ops)
+            foreach (KeyValuePair<string, List<Csv.TaifexOP>> entry in ops)
             {
-                var cp = new SortedDictionary<double, OPCsv>();
-                foreach (TaifexOPCsv op in entry.Value)
+                var cp = new SortedDictionary<double, Csv.OP>();
+                foreach (Csv.TaifexOP op in entry.Value)
                 {
-                    OPCsv v;
+                    Csv.OP v;
                     int total = Convert.ToInt32(op.Total);
 
                     if (!cp.ContainsKey(op.Price))
                     {
-                        v = new OPCsv() { Price = (int)op.Price };
+                        v = new Csv.OP() { Price = (int)op.Price };
                         cp[op.Price] = v;
                     }
                     else
@@ -157,7 +157,7 @@ namespace trader.OPS
                     }
                 }
 
-                var list = new List<OPCsv>();
+                var list = new List<Csv.OP>();
                 foreach (var item in cp.Values)
                 {
                     list.Add(item);

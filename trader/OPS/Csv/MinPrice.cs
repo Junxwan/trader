@@ -1,13 +1,13 @@
-﻿using System;
+﻿using CsvHelper.Configuration.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CsvHelper.Configuration.Attributes;
 
-namespace trader.OPS
+namespace trader.OPS.Csv
 {
-    public class MinPriceCsv
+    public class MinPrice
     {
         [Name("DateTime")]
         public DateTime DateTime { get; set; }
@@ -27,4 +27,5 @@ namespace trader.OPS
         [Name("Volume")]
         public int Volume { get; set; }
     }
+
 }

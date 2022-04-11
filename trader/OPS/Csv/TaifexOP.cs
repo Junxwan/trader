@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace trader.OPS
+namespace trader.OPS.Csv
 {
-    public class TaifexOPCsv
+    public class TaifexOP
     {
         //交易日期
         [Index(0)]
@@ -65,4 +65,5 @@ namespace trader.OPS
             return this.Type == "TXO" && this.S == "一般";
         }
     }
+
 }

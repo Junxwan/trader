@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace trader.OPS
+namespace trader.OPS.Csv
 {
-    public class OPCsv
+    public class OP
     {
         //合約價
         [Index(0)]
@@ -21,5 +21,4 @@ namespace trader.OPS
         [Index(2)]
         public int P { get; set; }
     }
-
 }

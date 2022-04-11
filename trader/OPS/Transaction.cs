@@ -22,7 +22,7 @@ namespace trader.OPS
 
         public bool ToMinPriceCsv(string file, string[] periods, int min = 5, string type = "TXO")
         {
-            var records = new Dictionary<string, Dictionary<int, Dictionary<string, List<TransactionCsv>>>>();
+            var records = new Dictionary<string, Dictionary<int, Dictionary<string, List<Csv.Transaction>>>>();
 
             using var reader = new StreamReader(file);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -44,7 +44,7 @@ namespace trader.OPS
                     int m = (t - (h * 10000)) / 100;
                     int s = t - (h * 10000 + m * 100);
 
-                    var record = new TransactionCsv
+                    var record = new Csv.Transaction
                     {
                         DateTime = DateTime.Parse(d + " " + h.ToString() + ":" + m.ToString() + ":" + s.ToString()),
                         Type = "TXO",
@@ -57,14 +57,14 @@ namespace trader.OPS
 
                     if (!records.ContainsKey(record.Period))
                     {
-                        records.Add(record.Period, new Dictionary<int, Dictionary<string, List<TransactionCsv>>>());
+                        records.Add(record.Period, new Dictionary<int, Dictionary<string, List<Csv.Transaction>>>());
                     }
 
                     if (!records[record.Period].ContainsKey(record.Performance))
                     {
-                        var pcp = new Dictionary<string, List<TransactionCsv>>();
-                        pcp.Add("C", new List<TransactionCsv>());
-                        pcp.Add("P", new List<TransactionCsv>());
+                        var pcp = new Dictionary<string, List<Csv.Transaction>>();
+                        pcp.Add("C", new List<Csv.Transaction>());
+                        pcp.Add("P", new List<Csv.Transaction>());
                         records[record.Period].Add(record.Performance, pcp);
                     }
 
@@ -72,17 +72,17 @@ namespace trader.OPS
                 }
             }
 
-            foreach (KeyValuePair<string, Dictionary<int, Dictionary<string, List<TransactionCsv>>>> row in records)
+            foreach (KeyValuePair<string, Dictionary<int, Dictionary<string, List<Csv.Transaction>>>> row in records)
             {
                 var dir = this.sourceDir + "\\price\\" + min.ToString() + "min\\" + row.Key;
-                Dictionary<string, List<MinPriceCsv>> minData;
+                Dictionary<string, List<Csv.MinPrice>> minData;
 
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
                 }
 
-                foreach (KeyValuePair<int, Dictionary<string, List<TransactionCsv>>> prow in row.Value)
+                foreach (KeyValuePair<int, Dictionary<string, List<Csv.Transaction>>> prow in row.Value)
                 {
                     var pdir = dir + "\\" + prow.Key;
 
@@ -91,7 +91,7 @@ namespace trader.OPS
                         Directory.CreateDirectory(pdir);
                     }
 
-                    foreach (KeyValuePair<string, List<TransactionCsv>> cp in prow.Value)
+                    foreach (KeyValuePair<string, List<Csv.Transaction>> cp in prow.Value)
                     {
                         if (cp.Value.Count == 0)
                         {
@@ -100,8 +100,8 @@ namespace trader.OPS
 
                         cp.Value.Sort((x, y) => x.DateTime.CompareTo(y.DateTime));
 
-                        minData = new Dictionary<string, List<MinPriceCsv>>();
-                        var vv = new MinPriceCsv()
+                        minData = new Dictionary<string, List<Csv.MinPrice>>();
+                        var vv = new Csv.MinPrice()
                         {
                             Open = cp.Value[0].Price,
                             High = cp.Value[0].Price,
@@ -122,11 +122,11 @@ namespace trader.OPS
 
                                 if (!minData.ContainsKey(date))
                                 {
-                                    minData[date] = new List<MinPriceCsv>();
+                                    minData[date] = new List<Csv.MinPrice>();
                                 }
 
                                 minData[date].Add(vv);
-                                vv = new MinPriceCsv()
+                                vv = new Csv.MinPrice()
                                 {
                                     Open = item.Price,
                                     High = item.Price,
@@ -157,7 +157,7 @@ namespace trader.OPS
 
                         CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);
 
-                        foreach (KeyValuePair<string, List<MinPriceCsv>> cdata in minData)
+                        foreach (KeyValuePair<string, List<Csv.MinPrice>> cdata in minData)
                         {
                             var f = pdir + "\\" + cdata.Key + "_" + cp.Key + ".csv";
 
