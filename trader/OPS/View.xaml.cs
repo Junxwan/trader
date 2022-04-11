@@ -18,32 +18,32 @@ namespace trader.OPS
 {
     public class PageData
     {
-        public List<OPDView> CALL { get; set; } = new List<OPDView>();
+        public List<DayView> CALL { get; set; } = new List<DayView>();
 
-        public List<OPDView> PUT { get; set; } = new List<OPDView>();
+        public List<DayView> PUT { get; set; } = new List<DayView>();
 
         public int[] Prices { set; get; } = new int[] { };
 
         public PageData() { }
 
-        public PageData(OPW opw, int performance = 0)
+        public PageData(Week opw, int performance = 0)
         {
-            List<OPD> data;
-            var _call = new List<OPDView>();
-            var _put = new List<OPDView>();
+            List<Day> data;
+            var _call = new List<DayView>();
+            var _put = new List<DayView>();
             var prices = new int[] { };
             (data, prices) = opw.Page(performance);
 
             foreach (var item in data)
             {
-                _call.Add(new OPDView(item, OP.Type.CALL));
+                _call.Add(new DayView(item, OP.Type.CALL));
             }
 
             data.Reverse();
 
             foreach (var item in data)
             {
-                _put.Add(new OPDView(item, OP.Type.PUT));
+                _put.Add(new DayView(item, OP.Type.PUT));
             }
 
             this.CALL = _call;
@@ -70,11 +70,11 @@ namespace trader.OPS
             }
         }
 
-        public OPManage Manage
+        public Manage Manage
         {
             get
             {
-                return (OPManage)GetValue(ManageProperty);
+                return (Manage)GetValue(ManageProperty);
             }
             set
             {
@@ -83,7 +83,7 @@ namespace trader.OPS
         }
 
         public static readonly DependencyProperty ManageProperty =
-            DependencyProperty.Register("Manage", typeof(OPManage), typeof(View));
+            DependencyProperty.Register("Manage", typeof(Manage), typeof(View));
 
         private void ComboBox_SelectionPeriodsChanged(object sender, SelectionChangedEventArgs e)
         {

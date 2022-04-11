@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace trader.OPS
 {
     //OP顯示的資料
-    public class OPDView
+    public class DayView
     {
-        private readonly OPD opd;
+        private readonly Day opd;
 
         private readonly OP.Type type;
 
@@ -52,7 +52,7 @@ namespace trader.OPS
             private set { }
         }
 
-        public OPDView(OPD op, OP.Type t)
+        public DayView(Day op, OP.Type t)
         {
             this.opd = op;
             this.type = t;

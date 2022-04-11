@@ -8,7 +8,7 @@ using trader.OPS.Csv;
 namespace trader.OPS
 {
     //某天OP未平倉
-    public class OPD
+    public class Day
     {
         //週別
         public string Period { get => this.period; }
@@ -49,7 +49,7 @@ namespace trader.OPS
         public int CallMaxSubChangePerformancePrices { get; private set; } = 0;
         public int PutMaxSubChangePerformancePrices { get; private set; } = 0;
 
-        public OPD(string period, int price, int PriceChange, DateTime dateTime, IEnumerable<Csv.OP> csv)
+        public Day(string period, int price, int PriceChange, DateTime dateTime, IEnumerable<Csv.OP> csv)
         {
             this.period = period;
             this.DateTime = dateTime;
@@ -71,7 +71,7 @@ namespace trader.OPS
             }
         }
 
-        public OPD(string period, int price, int[] performancePrices)
+        public Day(string period, int price, int[] performancePrices)
         {
             this.period = period;
             this.performancePrices = new SortedSet<int>();
@@ -109,7 +109,7 @@ namespace trader.OPS
         }
 
         //設定OP未平倉變化量
-        public void SetChange(OPD opd)
+        public void SetChange(Day opd)
         {
             foreach (var x in this.Calls)
             {
@@ -188,9 +188,9 @@ namespace trader.OPS
             return this.DateTime.ToString("ddd");
         }
 
-        public OPD SetRange(int min = 0, int max = 9999)
+        public Day SetRange(int min = 0, int max = 9999)
         {
-            var opd = this.MemberwiseClone() as OPD;
+            var opd = this.MemberwiseClone() as Day;
             (opd.Calls, opd.Puts) = opd.GetRange(min, max);
             return opd;
         }

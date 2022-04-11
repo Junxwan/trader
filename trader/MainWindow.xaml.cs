@@ -16,7 +16,7 @@ namespace trader
     /// </summary>
     public partial class MainWindow : Window
     {
-        private OPManage OP;
+        private Manage OP;
 
         private Price Futures;
 
@@ -28,7 +28,7 @@ namespace trader
             this.config = new Config();
             this.DataPath.Text = this.config.GetData("Path");
             this.Futures = new Price(this.DataPath.Text + "\\futures");
-            this.OP = new OPManage(this.DataPath.Text, this.Futures);
+            this.OP = new Manage(this.DataPath.Text, this.Futures);
             this.Date.SelectedDate = DateTime.Now;
 
             opPeriods.ItemsSource = this.OP.Periods;

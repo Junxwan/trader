@@ -11,12 +11,12 @@ using trader.Futures;
 namespace trader.OPS
 {
     // 某一週別OP未平倉
-    public class OPW
+    public class Week
     {
         private SortedList<DateTime, FuturesCsv> futures;
 
         //未平倉
-        public List<OPD> Value { get; private set; }
+        public List<Day> Value { get; private set; }
 
         //有開倉的履約價
         public int[] PerformancePrices { get; private set; } = new int[] { };
@@ -24,18 +24,18 @@ namespace trader.OPS
         //週別
         private string period;
 
-        public OPW(string period, FileInfo[] files, SortedList<DateTime, FuturesCsv> futures)
+        public Week(string period, FileInfo[] files, SortedList<DateTime, FuturesCsv> futures)
         {
             this.period = period;
             this.futures = futures;
-            Value = new List<OPD>();
+            Value = new List<Day>();
 
             foreach (var file in files)
             {
                 using var reader = new StreamReader(file.FullName);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
                 var date = DateTime.Parse(file.Name.Substring(0, file.Name.IndexOf('.')));
-                var opd = new OPD(period, futures[date].WSettlement > 0 ? futures[date].WSettlement : futures[date].Close, futures[date].Change, date, csv.GetRecords<Csv.OP>());
+                var opd = new Day(period, futures[date].WSettlement > 0 ? futures[date].WSettlement : futures[date].Close, futures[date].Change, date, csv.GetRecords<Csv.OP>());
                 Value.Add(opd);
 
                 if (this.PerformancePrices.Length < opd.PerformancePrices.Length)
@@ -56,15 +56,15 @@ namespace trader.OPS
             }
         }
 
-        public (List<OPD>, int[]) Page(int performance = 0)
+        public (List<Day>, int[]) Page(int performance = 0)
         {
-            var page = new List<OPD>(this.Value);
+            var page = new List<Day>(this.Value);
 
             if (page.Count < 6)
             {
                 for (int i = 0; i < 6 - this.Value.Count; i++)
                 {
-                    page.Add(new OPD(this.period, 0, this.PerformancePrices));
+                    page.Add(new Day(this.period, 0, this.PerformancePrices));
                 }
 
                 page.Sort((x, y) => x.DateTime.CompareTo(y.DateTime));

@@ -13,7 +13,7 @@ using trader.Futures;
 namespace trader.OPS
 {
     //管理OP
-    public class OPManage
+    public class Manage
     {
         //op資料目錄
         private readonly string sourceDir;
@@ -22,15 +22,15 @@ namespace trader.OPS
 
         public List<string> Periods { get; private set; }
 
-        private readonly SortedList<string, OPW> ops;
+        private readonly SortedList<string, Week> ops;
 
         private Price futures;
 
-        public OPManage(string sourceDir, Price futures)
+        public Manage(string sourceDir, Price futures)
         {
             this.sourceDir = sourceDir + "\\op\\chips";
             this.futures = futures;
-            this.ops = new SortedList<string, OPW>();
+            this.ops = new SortedList<string, Week>();
             this.LoadDirectory();
             this.Periods = this.GetPeriods();
         }
@@ -48,7 +48,7 @@ namespace trader.OPS
             return v;
         }
 
-        public OPW Get(string period)
+        public Week Get(string period)
         {
             FileInfo[] files = this.periodDirs[period].GetFiles("*.csv");
             Array.Sort(files, (f1, f2) => f2.Name.CompareTo(f1.Name));
@@ -57,11 +57,11 @@ namespace trader.OPS
             {
                 if (files.Length < 7)
                 {
-                    ops[period] = new OPW(period, files, this.futures.All());
+                    ops[period] = new Week(period, files, this.futures.All());
                 }
                 else
                 {
-                    ops[period] = new OPW(period, files[0..7], this.futures.All());
+                    ops[period] = new Week(period, files[0..7], this.futures.All());
                 }
             }
 

@@ -21,11 +21,11 @@ namespace trader
     /// </summary>
     public partial class OPWindow : Window
     {
-        public OPManage OP { get; set; }
+        public Manage OP { get; set; }
 
         public OPWindow()
         {
-            OP = new OPManage("G:\\我的雲端硬碟\\金融\\data", new Price("G:\\我的雲端硬碟\\金融\\data\\futures"));
+            OP = new Manage("G:\\我的雲端硬碟\\金融\\data", new Price("G:\\我的雲端硬碟\\金融\\data\\futures"));
 
             InitializeComponent();
         }
