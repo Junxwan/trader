@@ -103,8 +103,8 @@ namespace trader.OPS
             this.selectCallPerformanceSupportBox.ItemsSource = this.Page.Prices;
             this.selectPutPerformanceSupportBox.ItemsSource = this.Page.Prices;
 
-            this.callPutLine1.DrawTotal(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices);
-            this.callPutLine2.DrawChange(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices);
+            this.callPutLine1.DrawTotal(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices, this.page.CALL[0].Price);
+            this.callPutLine2.DrawChange(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices, this.page.PUT[0].Price);
         }
 
         private void OnPropertyChanged(string propertyName)

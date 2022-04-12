@@ -31,10 +31,10 @@ namespace trader.OPS.Chart
             InitializeComponent();
             this.line = this.chart;
             Crosshair = this.line.Plot.AddCrosshair(0, 0);
-            this.line.Refresh();
+            Crosshair.IsVisible = false;
         }
 
-        public void DrawTotal(List<OP> call, List<OP> put, int[] prices)
+        public void DrawTotal(List<OP> call, List<OP> put, int[] prices, int price)
         {
             var callTotal = new List<double>();
             var putTotal = new List<double>();
@@ -74,6 +74,19 @@ namespace trader.OPS.Chart
             putTotal.Reverse();
 
             this.line.Plot.Clear();
+
+            var index = 0;
+            foreach (var item in prices)
+            {
+                if (item >= price)
+                {
+                    this.line.Plot.AddVerticalLine(index, color: System.Drawing.Color.White);
+                    break;
+                }
+
+                index++;
+            }
+
             double[] positions = DataGen.Consecutive(prices.Length);
             this.line.Plot.AddScatter(positions, callTotal.ToArray(), label: "Call", color: System.Drawing.Color.Red);
             this.line.Plot.AddScatter(positions, putTotal.ToArray(), label: "Put", color: System.Drawing.Color.Green);
@@ -92,7 +105,7 @@ namespace trader.OPS.Chart
             this.line.Refresh();
         }
 
-        public void DrawChange(List<OP> call, List<OP> put, int[] prices)
+        public void DrawChange(List<OP> call, List<OP> put, int[] prices, int price)
         {
             var callTotal = new List<double>();
             var putTotal = new List<double>();
@@ -110,6 +123,19 @@ namespace trader.OPS.Chart
             putTotal.Reverse();
 
             this.line.Plot.Clear();
+
+            var index = 0;
+            foreach (var item in prices)
+            {
+                if (item >= price)
+                {
+                    this.line.Plot.AddVerticalLine(index, color: System.Drawing.Color.White);
+                    break;
+                }
+
+                index++;
+            }
+
             double[] positions = DataGen.Consecutive(prices.Length);
             this.line.Plot.AddScatter(positions, callTotal.ToArray(), label: "Call", color: System.Drawing.Color.Red);
             this.line.Plot.AddScatter(positions, putTotal.ToArray(), label: "Put", color: System.Drawing.Color.Green);

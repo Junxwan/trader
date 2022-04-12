@@ -36,6 +36,12 @@ namespace trader.OPS
             private set { }
         }
 
+        public int Price
+        {
+            get => this.opd.Price;
+            private set { }
+        }
+
         public string TotalText { get; set; }
 
         public List<OP> Value
