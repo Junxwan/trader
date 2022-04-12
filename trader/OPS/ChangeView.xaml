@@ -7,7 +7,7 @@
              xmlns:opchart="clr-namespace:trader.OPS.Chart"
              xmlns:c="clr-namespace:trader.OPS.Converter"
              mc:Ignorable="d" 
-             x:Name="opwin">
+             x:Name="opwin" Width="1920" Height="1080">
 
     <UserControl.Resources>
         <c:TotalChangeColorConverter x:Key="TotalChangeColorConverter"/>
@@ -235,6 +235,10 @@
                 <Label x:Name="cpTotalLabel" Content="0" FontSize="20" Canvas.Left="525" Canvas.Top="126" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Label Content="CP總變化量:" FontSize="20" Canvas.Left="404" Canvas.Top="161" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <Label x:Name="cpChangeTotalLabel" Content="0" FontSize="20" Canvas.Left="525" Canvas.Top="161" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Label Content="Call強壓:" FontSize="20" Canvas.Left="189" Canvas.Top="89" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectCallPerformanceMaxSupport" ItemsSource="{Binding Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceMaxSupport" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="94" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label Content="Put強撐:" FontSize="20" Canvas.Left="189" Canvas.Top="132" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectPutPerformanceMaxSupport" ItemsSource="{Binding Page.Prices, ElementName=opwin}" Height="24" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceMaxSupport" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="137" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             </Canvas>
         </Grid>
     </Grid>

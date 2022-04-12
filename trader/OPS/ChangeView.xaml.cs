@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -176,6 +177,58 @@ namespace trader.OPS
             this.cpChangeTotalLabel.Content = cAddTotal.ToString() + "/" + pAddTotal.ToString() + "/" + (cAddTotal - pAddTotal).ToString();
         }
 
+        private void ComboBox_SelectionPerformanceMaxSupport(object sender, SelectionChangedEventArgs e)
+        {
+            var call = this.selectCallPerformanceMaxSupport.SelectedValue != null ? (int)this.selectCallPerformanceMaxSupport.SelectedValue : 0;
+            var put = this.selectPutPerformanceMaxSupport.SelectedValue != null ? (int)this.selectPutPerformanceMaxSupport.SelectedValue : 0;
+
+            int index = 0;
+            foreach (var item in this.pricesDataGrid.Items)
+            {
+                var row = (DataGridRow)this.pricesDataGrid.ItemContainerGenerator.ContainerFromIndex(index);
+
+                if (row == null)
+                {
+                    break;
+                }
+
+                DataGridCellsPresenter presenter = FindVisualChild<DataGridCellsPresenter>(row);
+
+                var cell = ((DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(0));
+
+                if (call == (int)item)
+                {
+                    cell.Foreground = Brushes.Red;
+                }
+                else if (put == (int)item)
+                {
+                    cell.Foreground = Brushes.Green;
+                }
+                else {
+                    cell.Foreground = Brushes.White;
+                }
+
+                index++;
+            }
+        }
+
+        public static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                if (child != null && child is T)
+                    return (T)child;
+                else
+                {
+                    T childOfChild = FindVisualChild<T>(child);
+                    if (childOfChild != null)
+                        return childOfChild;
+                }
+            }
+            return null;
+        }
+
         private void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             int performance = 0;
@@ -202,6 +255,8 @@ namespace trader.OPS
                 this.selectCPMin,
                 this.selectCPMax,
                 this.selectCPMax,
+                this.selectCallPerformanceMaxSupport,
+                this.selectPutPerformanceMaxSupport,
             };
 
             foreach (var item in cs)
