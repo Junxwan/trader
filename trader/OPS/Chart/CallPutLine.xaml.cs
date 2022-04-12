@@ -89,11 +89,19 @@ namespace trader.OPS.Chart
             }
 
             double[] positions = DataGen.Consecutive(prices.Length);
-            this.line.Plot.AddScatter(positions, callTotal.ToArray(), label: "Call", color: System.Drawing.Color.Red);
-            this.line.Plot.AddScatter(positions, putTotal.ToArray(), label: "Put", color: System.Drawing.Color.Green);
+            var callLine = this.line.Plot.AddScatter(positions, callTotal.ToArray(), label: "Call", color: System.Drawing.Color.Red);
+            callLine.YAxisIndex = 0;
+            callLine.XAxisIndex = 0;
+            this.line.Plot.XAxis.ManualTickPositions(positions, prices.Select(x => x.ToString()).ToArray());
 
-            string[] labels = prices.Select(x => x.ToString()).ToArray();
-            this.line.Plot.XAxis.ManualTickPositions(positions, labels);
+            var putLine = this.line.Plot.AddScatter(positions, putTotal.ToArray(), label: "Put", color: System.Drawing.Color.Green);
+            putLine.YAxisIndex = 1;
+            putLine.XAxisIndex = 1;
+            this.line.Plot.XAxis2.ManualTickPositions(positions, prices.Select(x => x.ToString()).ToArray().Reverse().ToArray());
+
+            this.line.Plot.YAxis2.Ticks(true); 
+            this.line.Plot.XAxis2.Ticks(true);
+
             this.line.Plot.Title("Call/Put累積未平倉");
             this.line.Plot.XLabel("履約價");
             this.line.Plot.Title("累積未平倉");
@@ -120,8 +128,6 @@ namespace trader.OPS.Chart
             {
                 putTotal.Add(item.Change);
             }
-
-            putTotal.Reverse();
 
             this.line.Plot.Clear();
 

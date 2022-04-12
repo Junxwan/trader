@@ -7,7 +7,7 @@
              xmlns:opchart="clr-namespace:trader.OPS.Chart"
              xmlns:c="clr-namespace:trader.OPS.Converter"
              mc:Ignorable="d" 
-             x:Name="opwin" Width="1920" Height="1080">
+             x:Name="opwin">
 
     <UserControl.Resources>
         <c:TotalChangeColorConverter x:Key="TotalChangeColorConverter"/>
