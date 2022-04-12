@@ -1,4 +1,5 @@
 ﻿using ScottPlot;
+using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -102,8 +103,8 @@ namespace trader.OPS
             this.selectCallPerformanceSupportBox.ItemsSource = this.Page.Prices;
             this.selectPutPerformanceSupportBox.ItemsSource = this.Page.Prices;
 
-            DrawCallPutTotalChart();
-            DrawCallPutChangeChart();
+            this.callPutLine1.DrawTotal(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices);
+            this.callPutLine2.DrawChange(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices);
         }
 
         private void OnPropertyChanged(string propertyName)
@@ -112,97 +113,6 @@ namespace trader.OPS
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
-        }
-
-        private void DrawCallPutTotalChart()
-        {
-            var callTotal = new List<double>();
-            var putTotal = new List<double>();
-
-            foreach (var item in this.page.CALL[0].Value)
-            {
-                var total = 0.0;
-
-                if (callTotal.Count > 0)
-                {
-                    total = callTotal.Last() + item.Total;
-                }
-                else
-                {
-                    total = item.Total;
-                }
-
-                callTotal.Add(total);
-            }
-
-            foreach (var item in this.page.PUT[0].Value)
-            {
-                var total = 0.0;
-
-                if (putTotal.Count > 0)
-                {
-                    total = putTotal.Last() + item.Total;
-                }
-                else
-                {
-                    total = item.Total;
-                }
-
-                putTotal.Add(total);
-            }
-
-            putTotal.Reverse();
-
-            CallPutTotalChart.Plot.Clear();
-            double[] positions = DataGen.Consecutive(this.Page.Prices.Length);
-            CallPutTotalChart.Plot.AddScatter(positions, callTotal.ToArray(), label: "Call", color: System.Drawing.Color.Red);
-            CallPutTotalChart.Plot.AddScatter(positions, putTotal.ToArray(), label: "Put", color: System.Drawing.Color.Green);
-
-            string[] labels = this.Page.Prices.Select(x => x.ToString()).ToArray();
-            CallPutTotalChart.Plot.XAxis.ManualTickPositions(positions, labels);
-            CallPutTotalChart.Plot.Title("Call/Put累積未平倉");
-            CallPutTotalChart.Plot.XLabel("履約價");
-            CallPutTotalChart.Plot.Title("累積未平倉");
-            CallPutTotalChart.Plot.Legend();
-            CallPutTotalChart.Plot.Style(ScottPlot.Style.Gray2);
-            CallPutTotalChart.Plot.XAxis.Color(System.Drawing.Color.White);
-            CallPutTotalChart.Plot.YAxis.Color(System.Drawing.Color.White);
-            CallPutTotalChart.Refresh();
-        }
-
-        private void DrawCallPutChangeChart()
-        {
-            var callTotal = new List<double>();
-            var putTotal = new List<double>();
-
-            foreach (var item in this.page.CALL[0].Value)
-            {
-                callTotal.Add(item.Change);
-            }
-
-            foreach (var item in this.page.PUT[0].Value)
-            {
-                putTotal.Add(item.Change);
-            }
-
-            putTotal.Reverse();
-
-            CallPutChangeChart.Plot.Clear();
-            double[] positions = DataGen.Consecutive(this.Page.Prices.Length);
-            CallPutChangeChart.Plot.AddScatter(positions, callTotal.ToArray(), label: "Call", color: System.Drawing.Color.Red);
-            CallPutChangeChart.Plot.AddScatter(positions, putTotal.ToArray(), label: "Put", color: System.Drawing.Color.Green);
-
-            string[] labels = this.Page.Prices.Select(x => x.ToString()).ToArray();
-            CallPutChangeChart.Plot.XAxis.ManualTickPositions(positions, labels);
-            CallPutChangeChart.Plot.AddHorizontalLine(0, color: System.Drawing.Color.White);
-            CallPutChangeChart.Plot.Title("Call/Put未平倉增減");
-            CallPutChangeChart.Plot.XLabel("履約價");
-            CallPutChangeChart.Plot.Title("未平倉增減");
-            CallPutChangeChart.Plot.Legend();
-            CallPutChangeChart.Plot.Style(ScottPlot.Style.Gray2);
-            CallPutChangeChart.Plot.XAxis.Color(System.Drawing.Color.White);
-            CallPutChangeChart.Plot.YAxis.Color(System.Drawing.Color.White);
-            CallPutChangeChart.Refresh();
         }
 
         public ChangeView()

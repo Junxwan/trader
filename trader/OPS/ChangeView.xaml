@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:trader.OPS"
+             xmlns:opchart="clr-namespace:trader.OPS.Chart"
              xmlns:c="clr-namespace:trader.OPS.Converter"
              mc:Ignorable="d" 
              x:Name="opwin">
@@ -233,8 +234,8 @@
             </Grid.RowDefinitions>
 
             <Canvas Background="Gray" Grid.Row="0">
-                <WpfPlot Name="CallPutTotalChart" Height="350" Width="1600" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <WpfPlot Name="CallPutChangeChart" Height="350" Width="1600" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="350" />
+                <opchart:CallPutLine x:Name="callPutLine1" Height="350" Width="1600" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <opchart:CallPutLine x:Name="callPutLine2" Height="350" Width="1600" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="350"/>
             </Canvas>
 
             <Canvas Background="Gray" Grid.Row="1">
