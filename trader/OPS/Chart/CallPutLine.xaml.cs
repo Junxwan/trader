@@ -32,6 +32,7 @@ namespace trader.OPS.Chart
             this.line = this.chart;
             Crosshair = this.line.Plot.AddCrosshair(0, 0);
             Crosshair.IsVisible = false;
+            this.line.Refresh();
         }
 
         public void DrawTotal(List<OP> call, List<OP> put, int[] prices, int price)

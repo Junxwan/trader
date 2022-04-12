@@ -85,6 +85,97 @@ namespace trader.OPS
             }
         }
 
+        private void ComboBox_SelectionAddChange(object sender, SelectionChangedEventArgs e)
+        {
+            int index = 0;
+            foreach (var item in this.pricesDataGrid.Items)
+            {
+                var callMin = 0;
+                var callMax = 0;
+                var putMin = 0;
+                var putMax = 0;
+                var callRow = ((DataGridRow)this.callDataGrid.ItemContainerGenerator.ContainerFromIndex(index));
+                var putRow = ((DataGridRow)this.putDataGrid.ItemContainerGenerator.ContainerFromIndex(index));
+
+                if (this.selectCallAddMin.SelectedValue != null)
+                {
+                    callMin = (int)this.selectCallAddMin.SelectedValue;
+                }
+
+                if (this.selectCallAddMax.SelectedValue != null)
+                {
+                    callMax = (int)this.selectCallAddMax.SelectedValue;
+                }
+
+                if (this.selectPutAddMin.SelectedValue != null)
+                {
+                    putMin = (int)this.selectPutAddMin.SelectedValue;
+                }
+
+                if (this.selectPutAddMax.SelectedValue != null)
+                {
+                    putMax = (int)this.selectPutAddMax.SelectedValue;
+                }
+
+                if (callMin > 0 && callMax > 0)
+                {
+                    if (callMax >= (int)item && (int)item >= callMin)
+                    {
+                        callRow.Background = Brushes.Red;
+                    }
+                    else
+                    {
+                        callRow.Background = Brushes.White;
+                    }
+                }
+
+                if (putMin > 0 && putMax > 0)
+                {
+                    if (putMax >= (int)item && (int)item >= putMin)
+                    {
+                        putRow.Background = Brushes.Red;
+                    }
+                    else
+                    {
+                        putRow.Background = Brushes.White;
+                    }
+                }
+
+                index++;
+            }
+        }
+
+        private void ComboBox_SelectionCP(object sender, SelectionChangedEventArgs e)
+        {
+            var min = this.selectCPMin.SelectedValue != null ? (int)this.selectCPMin.SelectedValue : 0;
+            var max = this.selectCPMax.SelectedValue != null ? (int)this.selectCPMax.SelectedValue : 0;
+            var cTotal = 0;
+            var cAddTotal = 0;
+            var pTotal = 0;
+            var pAddTotal = 0;
+
+            foreach (var item in this.page.CALL[0].Value)
+            {
+                if (min <= item.PerformancePrice && max >= item.PerformancePrice)
+                {
+                    cTotal += item.Total;
+                    cAddTotal += item.Change;
+                }
+            }
+
+            foreach (var item in this.page.PUT[0].Value)
+            {
+                if (min <= item.PerformancePrice && max >= item.PerformancePrice)
+                {
+                    pTotal += item.Total;
+                    pAddTotal += item.Change;
+                }
+            }
+
+            this.cpTotalLabel.Content = cTotal.ToString() + "/" + pTotal.ToString() + "/" + (cTotal - pTotal).ToString();
+            this.cpChangeTotalLabel.Content = cAddTotal.ToString() + "/" + pAddTotal.ToString() + "/" + (cAddTotal - pAddTotal).ToString();
+        }
+
         private void datePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             int performance = 0;
@@ -99,9 +190,24 @@ namespace trader.OPS
                 DateTime.Parse(this.datePicker.Text).ToString("yyyy-MM-dd")
                 );
 
-            this.selectPerformanceBox.ItemsSource = this.Page.Prices;
-            this.selectCallPerformanceSupportBox.ItemsSource = this.Page.Prices;
-            this.selectPutPerformanceSupportBox.ItemsSource = this.Page.Prices;
+            var cs = new ComboBox[] {
+                this.selectPerformanceBox,
+                this.selectCallPerformanceSupportBox,
+                this.selectPutPerformanceSupportBox,
+                this.selectCallAddMin,
+                this.selectCallAddMax,
+                this.selectPutAddMin,
+                this.selectPutAddMax,
+                this.selectCPMin,
+                this.selectCPMin,
+                this.selectCPMax,
+                this.selectCPMax,
+            };
+
+            foreach (var item in cs)
+            {
+                item.SelectedValue = 0;
+            }
 
             this.callPutLine1.DrawTotal(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices, this.page.CALL[0].Price);
             this.callPutLine2.DrawChange(this.page.CALL[0].Value, this.page.PUT[0].Value, this.page.Prices, this.page.PUT[0].Price);

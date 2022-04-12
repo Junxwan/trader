@@ -139,42 +139,28 @@
             </Grid.ColumnDefinitions>
 
             <!--CALL未平倉-->
-            <ListView x:Name="callListView" ItemsSource="{Binding Path=Page.CALL, ElementName=opwin}" Grid.Column="0">
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel/>
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
-
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ListViewItem Width="170" Height="auto" Margin="0 0 -19 0">
-                            <StackPanel Background="Black">
-                                <Border Background="Red" BorderThickness="0.5" BorderBrush="Black">
-                                    <TextBlock Text="{Binding Path=PriceText}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                                </Border>
-                                <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
-                                    <TextBlock Text="{Binding Path=DateText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                                </Border>
-                                <TextBlock Text="{Binding Path=TotalText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                                <DataGrid x:Name="callDataGrid" SelectionMode="Extended" ItemsSource="{Binding Path=Value}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+            <StackPanel Background="Black" Grid.Column="0">
+                <Border Background="Red" BorderThickness="0.5" BorderBrush="Black">
+                    <TextBlock Text="{Binding Path=Page.CALL[0].PriceText, ElementName=opwin}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                </Border>
+                <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
+                    <TextBlock Text="{Binding Path=Page.CALL[0].DateText, ElementName=opwin}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                </Border>
+                <TextBlock Text="{Binding Path=Page.CALL[0].TotalText, ElementName=opwin}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                <DataGrid x:Name="callDataGrid" SelectionMode="Extended" ItemsSource="{Binding Path=Page.CALL[0].Value, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Change" Width="40*" Binding="{Binding Change}" />
-                                        <DataGridTextColumn Header="Total" Width="55*" Binding="{Binding Total}" />
-                                        <DataGridTextColumn Header="IsPerformance" Width="5*" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </ListViewItem>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Change" Width="40*" Binding="{Binding Change}" />
+                        <DataGridTextColumn Header="Total" Width="55*" Binding="{Binding Total}" />
+                        <DataGridTextColumn Header="IsPerformance" Width="5*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
 
             <!--履約價-->
             <StackPanel Grid.Column="1" Background="Black">
                 <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
-                    <Label Height="81" Background="Black"/>
+                    <Label Height="76" Background="Black"/>
                 </Border>
                 <DataGrid x:Name="pricesDataGrid" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
@@ -185,6 +171,7 @@
                             <Setter Property="TextBlock.FontWeight" Value="Bold"/>
                             <Setter Property="Background" Value="Black"/>
                             <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderThickness" Value="1"/>
                         </Style>
                     </DataGrid.CellStyle>
                     <DataGrid.Columns>
@@ -194,37 +181,23 @@
             </StackPanel>
 
             <!--PUT未平倉-->
-            <ListView x:Name="putListView" ItemsSource="{Binding Path=Page.PUT, ElementName=opwin}" Grid.Column="2">
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel/>
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
-
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ListViewItem Width="170" Height="auto" Margin="-15 0 -4 0">
-                            <StackPanel Background="Black">
-                                <Border Background="Green" BorderThickness="0.5" BorderBrush="Black">
-                                    <TextBlock Text="{Binding Path=PriceText}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                                </Border>
-                                <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
-                                    <TextBlock Text="{Binding Path=DateText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                                </Border>
-                                <TextBlock Text="{Binding Path=TotalText}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
-                                <DataGrid ItemsSource="{Binding Path=Value}" SelectionMode="Extended" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
+            <StackPanel Background="Black" Grid.Column="2">
+                <Border Background="Green" BorderThickness="0.5" BorderBrush="Black">
+                    <TextBlock Text="{Binding Path=Page.PUT[0].PriceText, ElementName=opwin}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                </Border>
+                <Border Background="Black" BorderThickness="0.5" BorderBrush="Black">
+                    <TextBlock Text="{Binding Path=Page.PUT[0].DateText, ElementName=opwin}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                </Border>
+                <TextBlock Text="{Binding Path=Page.PUT[0].TotalText, ElementName=opwin}"  VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="UltraBold"  FontSize="18" Height="25" Foreground="White"/>
+                <DataGrid x:Name="putDataGrid" ItemsSource="{Binding Path=Page.PUT[0].Value, ElementName=opwin}" SelectionMode="Extended" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="IsPerformance" Width="5*" />
-                                        <DataGridTextColumn Header="Total" Width="55*" Binding="{Binding Total}" />
-                                        <DataGridTextColumn Header="Change" Width="40*" Binding="{Binding Change}" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </ListViewItem>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="IsPerformance" Width="5*" />
+                        <DataGridTextColumn Header="Total" Width="55*" Binding="{Binding Total}" />
+                        <DataGridTextColumn Header="Change" Width="40*" Binding="{Binding Change}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Column="1">
@@ -234,8 +207,8 @@
             </Grid.RowDefinitions>
 
             <Canvas Background="Gray" Grid.Row="0">
-                <opchart:CallPutLine x:Name="callPutLine1" Height="350" Width="1600" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <opchart:CallPutLine x:Name="callPutLine2" Height="350" Width="1600" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="350"/>
+                <opchart:CallPutLine x:Name="callPutLine1" Height="250" Width="1600" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <opchart:CallPutLine x:Name="callPutLine2" Height="250" Width="1600" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="250"/>
             </Canvas>
 
             <Canvas Background="Gray" Grid.Row="1">
@@ -243,12 +216,25 @@
                 <Label Content="週期:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"/>
                 <Label Content="日期:" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" RenderTransformOrigin="0.549,1.271" Canvas.Top="30"/>
                 <DatePicker x:Name="datePicker" Canvas.Left="55" Canvas.Top="35" HorizontalAlignment="Left" VerticalAlignment="Center" Width="115" FontSize="15" SelectedDateChanged="datePicker_SelectedDateChanged"/>
-                <ComboBox x:Name="selectPerformanceBox" Text="履約價" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="55" Canvas.Top="66" HorizontalAlignment="Center" VerticalAlignment="Center" Width="105"/>
+                <ComboBox x:Name="selectPerformanceBox" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="55" Canvas.Top="66" HorizontalAlignment="Center" VerticalAlignment="Center" Width="105"/>
                 <Label Content="履約:" FontSize="20" RenderTransformOrigin="0.549,1.271" Canvas.Top="61" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <Label Content="Call壓力:" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="189" Canvas.Top="5"/>
-                <ComboBox x:Name="selectCallPerformanceSupportBox" Text="Call壓力" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceSupportChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="8" Width="105" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectCallPerformanceSupportBox" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceSupportChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="10" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <Label Content="Put支撐:" FontSize="20" Canvas.Left="189" Canvas.Top="49" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                <ComboBox x:Name="selectPutPerformanceSupportBox" Text="Put支撐" Height="24" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceSupportChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="54" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectPutPerformanceSupportBox" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="24" FontSize="14" SelectionChanged="ComboBox_SelectionPerformanceSupportChanged" RenderTransformOrigin="2.374,2.8" Canvas.Left="283" Canvas.Top="54" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label Content="Call量增:" FontSize="20" Canvas.Left="404" Canvas.Top="5" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectCallAddMin" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionAddChange" RenderTransformOrigin="2.374,2.8" Canvas.Left="498" Canvas.Top="10" Width="105" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectCallAddMax" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionAddChange" RenderTransformOrigin="2.374,2.8" Canvas.Left="608" Canvas.Top="10" Width="105" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Content="Put量增:" FontSize="20" Canvas.Left="404" Canvas.Top="48" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectPutAddMin" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionAddChange" RenderTransformOrigin="2.374,2.8" Canvas.Left="498" Canvas.Top="53" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectPutAddMax" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionAddChange" RenderTransformOrigin="2.374,2.8" Canvas.Left="608" Canvas.Top="53" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label Content="CP量:" FontSize="20" Canvas.Left="404" Canvas.Top="86" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectCPMin" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionCP" RenderTransformOrigin="2.374,2.8" Canvas.Left="498" Canvas.Top="91" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectCPMax" ItemsSource="{Binding Path=Page.Prices, ElementName=opwin}" Height="25" FontSize="14" SelectionChanged="ComboBox_SelectionCP" RenderTransformOrigin="2.374,2.8" Canvas.Left="608" Canvas.Top="91" Width="105" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label Content="CP總量:" FontSize="20" Canvas.Left="404" Canvas.Top="126" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label x:Name="cpTotalLabel" Content="0" FontSize="20" Canvas.Left="525" Canvas.Top="126" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Content="CP總變化量:" FontSize="20" Canvas.Left="404" Canvas.Top="161" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label x:Name="cpChangeTotalLabel" Content="0" FontSize="20" Canvas.Left="525" Canvas.Top="161" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </Canvas>
         </Grid>
     </Grid>
