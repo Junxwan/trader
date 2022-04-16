@@ -80,6 +80,18 @@ namespace trader.OPS
             }
         }
 
+        private List<FuturesWatch> fData = new List<FuturesWatch>();
+
+        public List<FuturesWatch> FData
+        {
+            get => fData;
+            set
+            {
+                fData = value;
+                OnPropertyChanged("FData");
+            }
+        }
+
         public _5minKView()
         {
             InitializeComponent();
@@ -99,13 +111,13 @@ namespace trader.OPS
         private void Button_Run_Click(object sender, RoutedEventArgs e)
         {
             var date = DateTime.Parse(this.datePicker.Text);
-            var data = this.Transaction.Get5MinK(this.selectPeriodBox.Text, date, this.mode.Text == "日");
-            var futures = this.Futures.Get5MinK(date, this.mode.Text == "日");
+            var IsDayPlate = this.mode.Text == "日";
+            var data = this.Transaction.Get5MinK(this.selectPeriodBox.Text, date, IsDayPlate);
             var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
             var endDateTime = startDateTime.AddHours(5);
             var watchs = new List<Watch>();
 
-            date = new DateTime(
+            var time = new DateTime(
                 date.Year, date.Month, date.Day,
                 Convert.ToInt32(this.hour.Text.Trim()),
                 Convert.ToInt32(this.minute.Text.Trim()),
@@ -125,7 +137,7 @@ namespace trader.OPS
 
                 foreach (var call in row.Value["call"])
                 {
-                    if (call.DateTime < startDateTime || call.DateTime > endDateTime || call.DateTime > date)
+                    if (call.DateTime < startDateTime || call.DateTime > endDateTime || call.DateTime > time)
                     {
                         continue;
                     }
@@ -142,7 +154,7 @@ namespace trader.OPS
 
                 foreach (var put in row.Value["put"])
                 {
-                    if (put.DateTime < startDateTime || put.DateTime > endDateTime || put.DateTime > date)
+                    if (put.DateTime < startDateTime || put.DateTime > endDateTime || put.DateTime > time)
                     {
                         continue;
                     }
@@ -170,6 +182,36 @@ namespace trader.OPS
             }
 
             this.Data = watchs;
+
+            var fw = new FuturesWatch();
+            fw.Name = "台指期";
+            fw.Month = this.selectPeriodBox.Text.Substring(4, 2);
+            var futures = this.Futures.Get5MinK(date, this.selectPeriodBox.Text);
+
+            foreach (var item in futures)
+            {
+                if (item.DateTime <= time)
+                {
+                    fw.Price = item.Close;
+                }
+            }
+
+            if (IsDayPlate)
+            {
+                var prevData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
+                var t = new DateTime(prevData[0].DateTime.Year, prevData[0].DateTime.Month, prevData[0].DateTime.Day, 13, 45, 0);
+                foreach (var item in prevData)
+                {
+                    if (item.DateTime == t)
+                    {
+                        fw.Change = fw.Price - item.Close;
+                        fw.Increase = Math.Round((fw.Change / item.Close) * 100, 2);
+                        break;
+                    }
+                }
+            }
+
+            this.FData = new List<FuturesWatch>() { fw };
         }
     }
 
@@ -195,5 +237,18 @@ namespace trader.OPS
 
         //履約價
         public string Performance { get; set; }
+    }
+
+    public class FuturesWatch
+    {
+        public string Name { get; set; }
+
+        public string Month { get; set; }
+
+        public double Price { get; set; }
+
+        public double Change { get; set; }
+
+        public double Increase { get; set; }
     }
 }

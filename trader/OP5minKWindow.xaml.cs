@@ -32,7 +32,7 @@ namespace trader
             var dataPath = (new Config()).GetData("Path");
             OP = new Manage(dataPath, new Price(dataPath + "\\futures"));
             Transaction = new trader.OPS.Transaction(dataPath);
-            Futures = new trader.Futures.Transaction(dataPath + "\\futures");
+            Futures = new trader.Futures.Transaction(dataPath);
 
             InitializeComponent();
         }

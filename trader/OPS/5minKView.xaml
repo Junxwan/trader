@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:trader.OPS"
              xmlns:c="clr-namespace:trader.OPS.Converter"
-             mc:Ignorable="d" x:Name="win" >
+             mc:Ignorable="d" x:Name="win">
 
     <UserControl.Resources>
         <c:GreaterOrEqualToConverter x:Key="GreaterOrEqualToConverter"/>
@@ -20,23 +20,14 @@
             <Setter Property="BorderThickness" Value="0.3 0.3 0.3 0.3"/>
             <Setter Property="BorderBrush" Value="Gray" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="3">
+                <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="履約價">
                     <Setter Property="Background" Value="#000066"/>
                     <Setter Property="Foreground" Value="#DEDEDE"/>
                 </DataTrigger>
                 <!--5000口以上-->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterOrEqualToConverter}, ConverterParameter=5000}" Value="true"></Condition>
-                    </MultiDataTrigger.Conditions>
-                    <MultiDataTrigger.Setters>
-                        <Setter Property="Foreground" Value="Red"/>
-                    </MultiDataTrigger.Setters>
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="6"></Condition>
+                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="總量"></Condition>
                         <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterOrEqualToConverter}, ConverterParameter=5000}" Value="true"></Condition>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.Setters>
@@ -46,17 +37,7 @@
                 <!--7000口以上-->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterOrEqualToConverter}, ConverterParameter=7000}" Value="true"></Condition>
-                    </MultiDataTrigger.Conditions>
-                    <MultiDataTrigger.Setters>
-                        <Setter Property="Foreground" Value="White"/>
-                        <Setter Property="Background" Value="#FFCE7979"/>
-                    </MultiDataTrigger.Setters>
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="6"></Condition>
+                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="總量"></Condition>
                         <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterOrEqualToConverter}, ConverterParameter=7000}" Value="true"></Condition>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.Setters>
@@ -67,17 +48,7 @@
                 <!--是否萬口以上-->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="0"></Condition>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterOrEqualToConverter}, ConverterParameter=7000}" Value="true"></Condition>
-                    </MultiDataTrigger.Conditions>
-                    <MultiDataTrigger.Setters>
-                        <Setter Property="Foreground" Value="White"/>
-                        <Setter Property="Background" Value="#990000"/>
-                    </MultiDataTrigger.Setters>
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="6"></Condition>
+                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="總量"></Condition>
                         <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterOrEqualToConverter}, ConverterParameter=7000}" Value="true"></Condition>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.Setters>
@@ -88,7 +59,7 @@
                 <!--漲跌-->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="1"></Condition>
+                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="漲跌"></Condition>
                         <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterConverter}, ConverterParameter=0}" Value="true"></Condition>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.Setters>
@@ -97,25 +68,7 @@
                 </MultiDataTrigger>
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="5"></Condition>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource GreaterConverter}, ConverterParameter=0}" Value="true"></Condition>
-                    </MultiDataTrigger.Conditions>
-                    <MultiDataTrigger.Setters>
-                        <Setter Property="Foreground" Value="Red"/>
-                    </MultiDataTrigger.Setters>
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="1"></Condition>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource LessConverter}, ConverterParameter=0}" Value="true"></Condition>
-                    </MultiDataTrigger.Conditions>
-                    <MultiDataTrigger.Setters>
-                        <Setter Property="Foreground" Value="Green"/>
-                    </MultiDataTrigger.Setters>
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.DisplayIndex}" Value="5"></Condition>
+                        <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Column.Header}" Value="漲跌"></Condition>
                         <Condition Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Content.Text, Converter={StaticResource LessConverter}, ConverterParameter=0}" Value="true"></Condition>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.Setters>
@@ -145,14 +98,14 @@
                 <RowDefinition Height="94*"/>
             </Grid.RowDefinitions>
 
-            <DataGrid Grid.Row="0" x:Name="headerDataGrid" AutoGenerateColumns="True" IsReadOnly="True"
-                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False">
+            <DataGrid Grid.Row="0" x:Name="headerDataGrid" ItemsSource="{Binding Path=FData, ElementName=win}" AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Margin="-6 0 0 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="商品" Width="20*" />
-                    <DataGridTextColumn Header="月" Width="20*" />
-                    <DataGridTextColumn Header="指數" Width="20*" />
-                    <DataGridTextColumn Header="漲跌" Width="20*" />
-                    <DataGridTextColumn Header="漲幅" Width="20*" />
+                    <DataGridTextColumn Header="商品" Width="20*" Binding="{Binding Name}" />
+                    <DataGridTextColumn Header="月" Width="20*" Binding="{Binding Month}" />
+                    <DataGridTextColumn Header="指數" Width="20*" Binding="{Binding Price}" />
+                    <DataGridTextColumn Header="漲跌" Width="20*" Binding="{Binding Change}" />
+                    <DataGridTextColumn Header="漲幅" Width="20*" Binding="{Binding Increase}" />
                 </DataGrid.Columns>
             </DataGrid>
 

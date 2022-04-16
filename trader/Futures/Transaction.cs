@@ -14,9 +14,12 @@ namespace trader.Futures
     {
         private readonly string sourceDir;
 
+        private SortedList<DateTime, List<MinPriceCsv>> data;
+
         public Transaction(string sourceDir)
         {
             this.sourceDir = sourceDir + "\\futures";
+            this.data = new SortedList<DateTime, List<MinPriceCsv>>();
         }
 
         public bool ToMinPriceCsv(string file, string periods, int min = 5, string type = "TX")
@@ -140,9 +143,70 @@ namespace trader.Futures
             return true;
         }
 
-        public List<MinPriceCsv> Get5MinK(DateTime date, bool IsDayPlate = true)
+        public List<MinPriceCsv> Get5MinK(DateTime date, string period)
         {
-            return new List<MinPriceCsv>();
+            if (this.data.ContainsKey(date))
+            {
+                return this.data[date];
+            }
+
+            var dir = this.sourceDir + "\\price\\5min\\" + period;
+            var files = new string[] { };
+            var fn = "";
+            foreach (var file in (new DirectoryInfo(dir)).GetFiles("*.csv"))
+            {
+                if (file.Name.StartsWith(date.ToString("yyyy-MM-dd")))
+                {
+                    files = new string[] {
+                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+".csv",
+                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+"-night.csv",
+                        file.DirectoryName+"\\"+fn.Replace("-night.csv","")+".csv",
+                        file.DirectoryName+"\\"+fn.Replace("-night.csv","")+"-night.csv",
+
+                    };
+                }
+                else
+                {
+                    fn = file.Name;
+                }
+            }
+
+            foreach (var path in files)
+            {
+                if (!File.Exists(path))
+                {
+                    continue;
+                }
+
+                var k = DateTime.Parse(Path.GetFileName(path).Substring(0, 10));
+
+                if (!this.data.ContainsKey(k))
+                {
+                    this.data[k] = new List<MinPriceCsv>();
+                }
+                else if (this.data[k].Count > 200)
+                {
+                    continue;
+                }
+
+                using var reader = new StreamReader(path);
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                {
+                    foreach (var item in csv.GetRecords<MinPriceCsv>())
+                    {
+                        this.data[k].Add(item);
+                    }
+                }
+            }
+
+            return this.data[date];
+        }
+
+        public List<MinPriceCsv> PrevGet5MinK(DateTime date, string period)
+        {
+            var dates = this.data.Keys.ToArray();
+            var index = Array.IndexOf(dates, date);
+            return this.data[dates[index-1]];
         }
     }
 }
