@@ -15,12 +15,18 @@ namespace trader.OPS
         //op資料目錄
         private readonly string sourceDir;
 
+        private Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>> data;
+
+        private Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>> nightData;
+
         public Transaction(string sourceDir)
         {
             this.sourceDir = sourceDir + "\\op";
+            this.data = new Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>>();
+            this.nightData = new Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>>();
         }
 
-        public bool ToMinPriceCsv(string file, string[] periods, int min = 5, string type = "TXO")
+        public bool ToMinPriceCsv(DateTime fileDate, string file, string[] periods, int min = 5, string type = "TXO")
         {
             var records = new Dictionary<string, Dictionary<int, Dictionary<string, List<Csv.Transaction>>>>();
 
@@ -115,7 +121,7 @@ namespace trader.OPS
 
                         foreach (var item in cp.Value)
                         {
-                            if (vv.DateTime <= item.DateTime || index == cp.Value.Count-1)
+                            if (vv.DateTime <= item.DateTime || index == cp.Value.Count - 1)
                             {
                                 vv.Volume = vv.Volume / 2;
                                 var date = vv.DateTime.ToString("yyyy-MM-dd");
@@ -159,14 +165,21 @@ namespace trader.OPS
 
                         foreach (KeyValuePair<string, List<Csv.MinPrice>> cdata in minData)
                         {
-                            var f = pdir + "\\" + cdata.Key + "_" + cp.Key + ".csv";
+                            string f = pdir + "\\" + cdata.Key + "-" + cp.Key;
+
+                            if (fileDate.ToString("yyyy-MM-dd") != cdata.Key)
+                            {
+                                f += "-night";
+                            }
+
+                            f += ".csv";
 
                             if (!File.Exists(f))
                             {
                                 FileStream fs = File.Create(f);
                                 fs.Close();
                                 fs.Dispose();
-                            }                         
+                            }
 
                             using var writer = new StreamWriter(f, false, Encoding.UTF8);
                             using var csvw = new CsvWriter(writer, csvConfig);
@@ -177,6 +190,127 @@ namespace trader.OPS
             }
 
             return true;
+        }
+
+        private void Load(string period, DateTime dateTime)
+        {
+            if (!this.data.ContainsKey(period))
+            {
+                this.data[period] = new Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>();
+            }
+
+            if (!this.data[period].ContainsKey(dateTime))
+            {
+                this.data[period][dateTime] = new SortedList<string, Dictionary<string, List<Csv.MinPrice>>>();
+            }
+
+            if (this.data[period][dateTime].Count > 0)
+            {
+                return;
+            }
+
+            var dir = this.sourceDir + "\\price\\5min\\" + period;
+
+            foreach (var info in (new DirectoryInfo(dir)).GetDirectories())
+            {
+                var op = new Dictionary<string, List<Csv.MinPrice>>();
+                var date = dateTime.ToString("yyyy-MM-dd");
+                op["call"] = new List<Csv.MinPrice>();
+                op["put"] = new List<Csv.MinPrice>();
+
+                foreach (var file in info.GetFiles(date + "*.csv"))
+                {
+                    if ((file.Name[11] != 'P' && file.Name[11] != 'C') || file.Name.Contains("night"))
+                    {
+                        continue;
+                    }
+
+                    using var reader = new StreamReader(file.FullName);
+                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                    {
+                        foreach (var item in csv.GetRecords<Csv.MinPrice>())
+                        {
+                            switch (file.Name[11])
+                            {
+                                case 'P':
+                                    op["put"].Add(item);
+                                    break;
+                                case 'C':
+                                    op["call"].Add(item);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                this.data[period][dateTime].Add(info.Name, op);
+            }
+        }
+
+        private void LoadNight(string period, DateTime dateTime)
+        {
+            if (!this.nightData.ContainsKey(period))
+            {
+                this.nightData[period] = new Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>();
+            }
+
+            if (!this.nightData[period].ContainsKey(dateTime))
+            {
+                this.nightData[period][dateTime] = new SortedList<string, Dictionary<string, List<Csv.MinPrice>>>();
+            }
+
+            if (this.nightData[period][dateTime].Count > 0)
+            {
+                return;
+            }
+
+            var dir = this.sourceDir + "\\price\\5min\\" + period;
+
+            foreach (var info in (new DirectoryInfo(dir)).GetDirectories())
+            {
+                var op = new Dictionary<string, List<Csv.MinPrice>>();
+                var date = dateTime.ToString("yyyy-MM-dd");
+                op["call"] = new List<Csv.MinPrice>();
+                op["put"] = new List<Csv.MinPrice>();
+
+                foreach (var file in info.GetFiles(date + "*.csv"))
+                {
+                    if ((file.Name[11] != 'P' && file.Name[11] != 'C') || !file.Name.Contains("night"))
+                    {
+                        continue;
+                    }
+
+                    using var reader = new StreamReader(file.FullName);
+                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                    {
+                        foreach (var item in csv.GetRecords<Csv.MinPrice>())
+                        {
+                            switch (file.Name[11])
+                            {
+                                case 'P':
+                                    op["put"].Add(item);
+                                    break;
+                                case 'C':
+                                    op["call"].Add(item);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                this.nightData[period][dateTime].Add(info.Name, op);
+            }
+        }
+
+        //5分K資料
+        public SortedList<string, Dictionary<string, List<Csv.MinPrice>>> Get5MinK(string period, DateTime dateTime, bool IsDayPlate = true)
+        {
+            this.Load(period, dateTime);
+            if (!IsDayPlate)
+            {
+                return this.nightData[period][dateTime];
+            }
+            return this.data[period][dateTime];
         }
     }
 }

@@ -13,6 +13,7 @@
             <MenuItem Header="OP">
                 <MenuItem Header="未平倉" Click="Button_OPWindow_Click"/>
                 <MenuItem Header="當日未平倉變化" Click="Button_OPChangeWindow_Click"/>
+                <MenuItem Header="5minK" Click="Button_OP5minKWindow_Click"/>
             </MenuItem>
         </Menu>
         <Canvas>

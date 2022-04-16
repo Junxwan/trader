@@ -49,6 +49,13 @@ namespace trader
             op.Show();
         }
 
+        //打開OP 5分K
+        private void Button_OP5minKWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var op = new OP5minKWindow();
+            op.Show();
+        }    
+
         //選擇資料目錄
         private void Button_OpenDataDir_Click(object sender, RoutedEventArgs e)
         {
@@ -98,10 +105,11 @@ namespace trader
         //產生OP 5分K
         private void Button_OP_TO_5MinK_Click(object sender, RoutedEventArgs e)
         {
-            var date = DateTime.Parse(this.Date.Text).ToString("yyyy_MM_dd");
+            var d = DateTime.Parse(this.Date.Text);
+            var date = d.ToString("yyyy_MM_dd");
             var file = this.DataPath.Text + "\\op\\transaction\\OptionsDaily_" + date;
             ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
-            (new trader.OPS.Transaction(this.DataPath.Text)).ToMinPriceCsv(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
+            (new trader.OPS.Transaction(this.DataPath.Text)).ToMinPriceCsv(d, Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
             File.Delete(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv");
 
             System.Windows.MessageBox.Show("完成");

@@ -9,7 +9,13 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="OP5minKWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="OPChangeWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="OPS\5minKView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="OPS\ChangeView.xaml.cs">
@@ -29,7 +35,13 @@
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="OP5minKWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="OPChangeWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="OPS\5minKView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="OPS\ChangeView.xaml">

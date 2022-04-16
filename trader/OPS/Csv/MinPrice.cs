@@ -9,6 +9,7 @@ namespace trader.OPS.Csv
 {
     public class MinPrice
     {
+        [Format("yyyy-MM-dd HH:mm:ss")]
         [Name("DateTime")]
         public DateTime DateTime { get; set; }
 

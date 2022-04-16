@@ -77,7 +77,7 @@ namespace trader.Futures
                     {
                         vv.Volume = vv.Volume / 2;
                         data.Add(vv);
-                        
+
                         vv = new MinPriceCsv()
                         {
                             Open = v.Price,
@@ -124,7 +124,7 @@ namespace trader.Futures
                     FileStream fs = File.Create(f);
                     fs.Close();
                     fs.Dispose();
-                }               
+                }
 
                 using var writer = new StreamWriter(f, false, Encoding.UTF8);
                 using var csvw = new CsvWriter(writer, csvConfig);
@@ -132,6 +132,11 @@ namespace trader.Futures
             }
 
             return true;
+        }
+
+        public List<MinPriceCsv> Get5MinK(DateTime date, bool IsDayPlate = true)
+        {
+            return new List<MinPriceCsv>();
         }
     }
 }
