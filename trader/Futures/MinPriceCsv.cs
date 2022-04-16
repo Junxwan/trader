@@ -9,6 +9,7 @@ namespace trader.Futures
 {
     public class MinPriceCsv
     {
+        [Format("yyyy-MM-dd HH:mm:ss")]
         [Name("DateTime")]
         public DateTime DateTime { get; set; }
 

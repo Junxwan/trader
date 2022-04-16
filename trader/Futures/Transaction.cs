@@ -67,7 +67,6 @@ namespace trader.Futures
                     DateTime = item.Value[0].DateTime.AddSeconds(-item.Value[0].DateTime.Second)
                 };
 
-
                 vv.DateTime = vv.DateTime.AddMinutes(5 - (item.Value[0].DateTime.Minute % 5));
                 var data = new List<MinPriceCsv>();
 
@@ -110,14 +109,21 @@ namespace trader.Futures
 
                 CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);
 
-                var dir = this.sourceDir + "\\" + min.ToString() + "min\\" + periods;
+                var dir = this.sourceDir + "\\price\\" + min.ToString() + "min\\" + periods;
 
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
                 }
 
-                var f = dir + "\\" + item.Key + ".csv";
+                var f = dir + "\\" + item.Key;
+
+                if (item.Key == records.Keys.ToList()[0])
+                {
+                    f += "-night";
+                }
+
+                f += ".csv";
 
                 if (!File.Exists(f))
                 {
