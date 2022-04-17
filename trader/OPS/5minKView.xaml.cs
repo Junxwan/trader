@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScottPlot;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -92,11 +93,42 @@ namespace trader.OPS
             }
         }
 
+        private List<VerticalHeader> verticalHeaders = new List<VerticalHeader>();
+
+        public List<VerticalHeader> VerticalHeaders
+        {
+            get => verticalHeaders;
+            set
+            {
+                verticalHeaders = value;
+            }
+        }
+
+        private List<VerticalWatchData> verticalWatchData = new List<VerticalWatchData>();
+        public List<VerticalWatchData> VerticalWatchData
+        {
+            get => verticalWatchData;
+            set
+            {
+                verticalWatchData = value;
+                OnPropertyChanged("VerticalWatchData");
+            }
+        }
+
         public _5minKView()
         {
+            var v = new VerticalHeader();
+            v.BCall = "空差";
+            v.SPut = "多差";
+            this.verticalHeaders.Add(v);
+
             InitializeComponent();
 
             this.datePicker.SelectedDate = DateTime.Now;
+            this.diffPrices.ItemsSource = new int[] { 50, 100, 150, 200 };
+            this.diffPrices.SelectedIndex = 0;
+
+            this.selectCP.ItemsSource = new string[] { "call", "put" };
         }
 
         private void OnPropertyChanged(string propertyName)
@@ -148,6 +180,7 @@ namespace trader.OPS
             }
 
             var colsePrice = this.Transaction.PrevGetLast5MinK(this.selectPeriodBox.Text, date, IsDayPlate);
+            var performances = new List<string>();
 
             foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in data)
             {
@@ -192,9 +225,15 @@ namespace trader.OPS
                     PPrice = PPrice,
                     Performance = row.Key,
                 });
+
+                performances.Add(row.Key);
             }
 
             this.Data = watchs;
+
+            this.Performances.ItemsSource = performances;
+
+            this.LoadVerticalWatchData();
         }
 
         public void LoadFuturesWatch(DateTime date, DateTime time)
@@ -230,6 +269,46 @@ namespace trader.OPS
             this.FData = new List<FuturesWatch>() { fw };
         }
 
+        public void LoadVerticalWatchData()
+        {
+            var d = new SortedList<int, Dictionary<string, double>>();
+            var watch = new List<VerticalWatchData>();
+            var diff = Convert.ToInt32(this.diffPrices.SelectedValue);
+
+            foreach (var item in this.Data)
+            {
+                var v = new Dictionary<string, double>();
+                v["call"] = item.CPrice;
+                v["put"] = item.PPrice;
+                d[Convert.ToInt32(item.Performance)] = v;
+            }
+
+            foreach (var performance in d.Keys.ToArray())
+            {
+                double call = 0;
+                double put = 0;
+
+                if (d.ContainsKey(performance + diff))
+                {
+                    call = Math.Round(d[performance]["call"] - d[performance + diff]["call"], 2);
+                    put = Math.Round(d[performance + diff]["put"] - d[performance]["put"], 2);
+                }
+
+                if (call > 0 || put > 0)
+                {
+                    watch.Add(new VerticalWatchData()
+                    {
+                        Call = call,
+                        Put = put,
+                        CPerformance = performance,
+                        PPerformance = performance + diff,
+                    });
+                }
+            }
+
+            this.VerticalWatchData = watch;
+        }
+
         private void Button_Run_Click(object sender, RoutedEventArgs e)
         {
             var date = DateTime.Parse(this.datePicker.Text);
@@ -242,6 +321,117 @@ namespace trader.OPS
 
             this.Load(date, time);
             this.LoadFuturesWatch(date, time);
+        }
+
+        private void DiffPrices_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.LoadVerticalWatchData();
+        }
+
+        private void Performances_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.selectCP.SelectedValue == null || this.Performances.SelectedValue == null)
+            {
+                return;
+            }
+
+            var date = DateTime.Parse(this.datePicker.Text);
+            var data = this.Transaction.PrevGet5MinK(this.selectPeriodBox.Text, date);
+
+            foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in this.Transaction.Get5MinK(this.selectPeriodBox.Text, date))
+            {
+                if (data.ContainsKey(row.Key))
+                {
+                    data[row.Key]["call"].AddRange(row.Value["call"]);
+                    data[row.Key]["put"].AddRange(row.Value["put"]);
+                }
+                else
+                {
+                    data[row.Key] = row.Value;
+                }
+            }
+
+            string performance = this.Performances.SelectedValue.ToString();
+            string prevPerformance = (Convert.ToInt32(performance) - Convert.ToInt32(this.diffPrices.Text)).ToString();
+            string nextPerformance = (Convert.ToInt32(performance) + Convert.ToInt32(this.diffPrices.Text)).ToString();
+            var prices = new Dictionary<string, SortedList<DateTime, double>>();
+            var cp = this.selectCP.SelectedValue.ToString();
+            var title = "";
+            int buyIndex = 0;
+            List<Csv.MinPrice> sell;
+            List<Csv.MinPrice> buy;
+            prices[cp] = new SortedList<DateTime, double>();
+
+            if (cp == "call")
+            {
+                sell = data[performance][cp];
+                buy = data[nextPerformance][cp];
+                title = "買權空差 Sell " + performance + " Buy " + nextPerformance + " 歷史價差";
+            }
+            else
+            {
+                buy = data[performance][cp];
+                sell = data[prevPerformance][cp];
+                title = "賣權多差 Sell " + prevPerformance + " Buy " + performance + " 歷史價差";
+            }
+
+            for (int i = 0; i < sell.Count; i++)
+            {
+                var sellDateTime = sell[i].DateTime;
+
+                for (int ci = buyIndex; ci < buy.Count; ci++)
+                {
+                    buyIndex = ci;
+
+                    if (buy[ci].DateTime.Equals(sellDateTime))
+                    {
+                        prices[cp][sellDateTime] = Math.Round(sell[i].Close - buy[ci].Close, 2);
+                        break;
+                    }
+                    else if (buy[ci].DateTime > sellDateTime)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            var fPrices = new List<double>();
+            var fData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
+            fData.AddRange(this.Futures.Get5MinK(date, this.selectPeriodBox.Text));
+            var fIndex = 0;
+            foreach (var item in prices[cp].Keys)
+            {
+                for (int i = fIndex; i < fData.Count; i++)
+                {
+                    fIndex = i;
+                    if (fData[i].DateTime.Equals(item))
+                    {
+                        fPrices.Add(fData[i].Close);
+                        break;
+                    }
+                    else if (fData[i].DateTime > item)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            this.DiffPricesChart.Plot.Clear();
+            double[] positions = DataGen.Consecutive(prices[cp].Count);
+            double[] dates = prices[cp].Keys.Select(x => x.ToOADate()).ToArray();
+            var opChart = this.DiffPricesChart.Plot.AddScatter(dates, prices[cp].Values.ToArray(), label: cp, color: System.Drawing.Color.Red);
+            opChart.YAxisIndex = 0;
+            opChart.XAxisIndex = 0;
+
+            var futuresChart = this.DiffPricesChart.Plot.AddScatter(dates, fPrices.ToArray(), label: "台指", color: System.Drawing.Color.Green);
+            futuresChart.YAxisIndex = 1;
+            futuresChart.XAxisIndex = 0;
+            this.DiffPricesChart.Plot.YAxis2.Ticks(true);
+
+            this.DiffPricesChart.Plot.XAxis.ManualTickSpacing(12);
+            this.DiffPricesChart.Plot.XAxis.DateTimeFormat(true);
+            this.DiffPricesChart.Plot.Title(title);
+            this.DiffPricesChart.Refresh();
         }
     }
 
@@ -280,5 +470,25 @@ namespace trader.OPS
         public double Change { get; set; }
 
         public double Increase { get; set; }
+    }
+
+    public class VerticalHeader
+    {
+        public string BCall { get; set; }
+
+        public string SPut { get; set; }
+    }
+
+    public class VerticalWatchData
+    {
+        public double Call { get; set; }
+
+        public double Put { get; set; }
+
+        public int Performance { get; set; }
+
+        public int CPerformance { get; set; }
+
+        public int PPerformance { get; set; }
     }
 }

@@ -88,9 +88,11 @@
     <Grid Background="Black">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="25*"/>
-            <ColumnDefinition Width="75*"/>
+            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="60*"/>
         </Grid.ColumnDefinitions>
 
+        <!--盤中行情-->
         <Grid Background="Gray"  Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="5*"/>
@@ -134,12 +136,53 @@
             </DataGrid>
         </Grid>
 
-        <Grid Grid.Column="1" Grid.Row="1">
+        <!--垂直價差單-->
+        <Grid Background="Gray"  Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="94*"/>
+            </Grid.RowDefinitions>
+
+            <DataGrid Grid.Row="0" ItemsSource="{Binding Path=VerticalHeaders, ElementName=win}"  AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Margin="-6 0 0 0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Call" Width="40*" Binding="{Binding BCall}"/>
+                    <DataGridTextColumn Header="" Width="20*" />
+                    <DataGridTextColumn Header="Put" Width="40*" Binding="{Binding SPut}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="40*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="Green"/>
+                <Border Grid.Column="1" Background="Black"/>
+                <Border Grid.Column="2" Background="Red"/>
+            </Grid>
+
+            <DataGrid Grid.Row="2" x:Name="verticalDataGrid" ItemsSource="{Binding Path=VerticalWatchData, ElementName=win}" AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Margin="-6 0 0 0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding Call}" />
+                    <DataGridTextColumn Header="履約價" Width="25*" Binding="{Binding CPerformance}"/>
+                    <DataGridTextColumn Header="履約價" Width="25*" Binding="{Binding PPerformance}"/>
+                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding Put}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <Grid Grid.Column="2" Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="80*"/>
                 <RowDefinition Height="20*"/>
             </Grid.RowDefinitions>
-            <Canvas Grid.Row="0"></Canvas>
+            <Canvas Grid.Row="0">
+                <WpfPlot Name="DiffPricesChart" Height="400" Width="1200" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            </Canvas>
             <Canvas Grid.Row="1" Background="Gray">
                 <DatePicker x:Name="datePicker" Canvas.Left="60" Canvas.Top="5" FontSize="20"/>
                 <Label Content="日期:" HorizontalAlignment="Left" FontSize="20" Margin="0,5,0,0" VerticalAlignment="Top"/>
@@ -148,7 +191,11 @@
                 <TextBox x:Name="minute" FontSize="20" TextWrapping="Wrap" Text="45" Canvas.Left="104" Canvas.Top="83" HorizontalAlignment="Center" VerticalAlignment="Top" Width="30" RenderTransformOrigin="0.194,0.474"/>
                 <Button Content="執行" FontSize="20" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Canvas.Left="2" Canvas.Top="166" Width="155" Click="Button_Run_Click"/>
                 <Label Content="週別:" FontSize="20" HorizontalAlignment="Left" Canvas.Top="40" VerticalAlignment="Top" Canvas.Left="1"/>
-                <ComboBox x:Name="selectPeriodBox" ItemsSource="{Binding Path=Manage.Periods, ElementName=win}" FontSize="20" Canvas.Left="62" Canvas.Top="43" Width="120" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <ComboBox x:Name="selectPeriodBox" ItemsSource="{Binding Path=Manage.Periods, ElementName=win}" FontSize="20" Canvas.Left="62" Canvas.Top="43" Width="160" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Content="價差:" FontSize="20" Canvas.Top="112" Canvas.Left="1" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="diffPrices" ItemsSource="{Binding Manage.Periods, ElementName=win}" FontSize="20" Canvas.Left="62" Canvas.Top="115" Width="90" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="DiffPrices_SelectionChanged"/>
+                <ComboBox x:Name="Performances" FontSize="20" Canvas.Left="157" Canvas.Top="115" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="Performances_SelectionChanged"/>
+                <ComboBox x:Name="selectCP" FontSize="20" Canvas.Left="312" Canvas.Top="116" Width="70" SelectionChanged="Performances_SelectionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Canvas>
         </Grid>
     </Grid>
