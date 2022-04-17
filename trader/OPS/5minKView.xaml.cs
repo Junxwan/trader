@@ -107,32 +107,44 @@ namespace trader.OPS
             }
         }
 
-        private void Button_Run_Click(object sender, RoutedEventArgs e)
+        public void Load(DateTime date, DateTime time)
         {
-            bool IsDayPlate = true;
-            var date = DateTime.Parse(this.datePicker.Text);
+            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
+            var endDateTime = startDateTime.AddHours(5);
+            bool IsDayPlate = (startDateTime > time || time > endDateTime) ? false : true;
+
             var data = this.Transaction.Get5MinK(this.selectPeriodBox.Text, date);
             var watchs = new List<Watch>();
 
-            var time = new DateTime(
-                date.Year, date.Month, date.Day,
-                Convert.ToInt32(this.hour.Text.Trim()),
-                Convert.ToInt32(this.minute.Text.Trim()),
-                0
-                );
-
-            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
-            var endDateTime = startDateTime.AddHours(5);
-
-            if (startDateTime > time || time > endDateTime)
-            {
-                IsDayPlate = false;
-            }
-
             if (!IsDayPlate)
             {
+                var pData = this.Transaction.PrevGet5MinK(this.selectPeriodBox.Text, date);
+                foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in data)
+                {
+                    if (pData.ContainsKey(row.Key))
+                    {
+                        pData[row.Key]["call"].AddRange(row.Value["call"]);
+                        pData[row.Key]["put"].AddRange(row.Value["put"]);
+                    }
+                    else
+                    {
+                        pData[row.Key] = row.Value;
+                    }
+                }
+
+                if (pData.First().Value["call"].Count > 0)
+                {
+                    date = DateTime.Parse(pData.First().Value["call"][0].DateTime.ToString("yyyy-MM-dd"));
+                }
+                else
+                {
+                    date = DateTime.Parse(pData.First().Value["put"][0].DateTime.ToString("yyyy-MM-dd"));
+                }
+
                 startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
                 endDateTime = startDateTime.AddHours(14);
+
+                data = pData;
             }
 
             var colsePrice = this.Transaction.PrevGetLast5MinK(this.selectPeriodBox.Text, date, IsDayPlate);
@@ -183,9 +195,10 @@ namespace trader.OPS
             }
 
             this.Data = watchs;
+        }
 
-            // ==============================台指期=============================================
-
+        public void LoadFuturesWatch(DateTime date, DateTime time)
+        {
             var fw = new FuturesWatch();
             fw.Name = "台指期";
             fw.Month = this.selectPeriodBox.Text.Substring(4, 2);
@@ -201,17 +214,8 @@ namespace trader.OPS
                 }
             }
 
-            //拿上一收盤價
-            if (IsDayPlate)
-            {
-                prevData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
-                CloseTime = new DateTime(prevData[0].DateTime.Year, prevData[0].DateTime.Month, prevData[0].DateTime.Day, 13, 45, 0);
-            }
-            else
-            {
-                CloseTime = new DateTime(date.Year, date.Month, date.Day, 13, 45, 0);
-                prevData = futures;
-            }
+            prevData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
+            CloseTime = new DateTime(prevData[0].DateTime.Year, prevData[0].DateTime.Month, prevData[0].DateTime.Day, 13, 45, 0);
 
             foreach (var item in prevData)
             {
@@ -224,6 +228,20 @@ namespace trader.OPS
             }
 
             this.FData = new List<FuturesWatch>() { fw };
+        }
+
+        private void Button_Run_Click(object sender, RoutedEventArgs e)
+        {
+            var date = DateTime.Parse(this.datePicker.Text);
+            var time = new DateTime(
+                date.Year, date.Month, date.Day,
+                Convert.ToInt32(this.hour.Text.Trim()),
+                Convert.ToInt32(this.minute.Text.Trim()),
+                0
+                );
+
+            this.Load(date, time);
+            this.LoadFuturesWatch(date, time);
         }
     }
 

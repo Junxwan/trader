@@ -316,6 +316,40 @@ namespace trader.OPS
             return this.data[period][dates[index - 1]];
         }
 
+        public SortedList<string, Dictionary<string, List<Csv.MinPrice>>> NextGet5MinK(string period, DateTime dateTime)
+        {
+            var dates = this.data[period].Keys.ToArray();
+            var index = Array.IndexOf(dates, dateTime);
+            if (dates.Length < (index + 2))
+            {
+                var dir = this.sourceDir + "\\price\\5min\\" + period;
+                var yn = "";
+                foreach (var file in (new DirectoryInfo(dir)).GetFiles("*.csv"))
+                {
+                    if (file.Name.Substring(0, 10) == dateTime.ToString("yyyy-MM-dd"))
+                    {
+                        if (yn != "")
+                        {
+                            dateTime = DateTime.Parse(yn.Substring(0, 10));
+
+                        }
+
+                        break;
+                    }
+                    else
+                    {
+                        yn = file.Name;
+                    }
+                }
+
+                this.Get5MinK(period, dateTime);
+                dates = this.data[period].Keys.ToArray();
+                index = Array.IndexOf(dates, dateTime);
+            }
+
+            return this.data[period][dates[index + 1]];
+        }
+
         public Dictionary<string, Dictionary<string, Csv.MinPrice>> PrevGetLast5MinK(string period, DateTime dateTime, bool IsDayPlate = true)
         {
             var colsePrice = new Dictionary<string, Dictionary<string, Csv.MinPrice>>();
