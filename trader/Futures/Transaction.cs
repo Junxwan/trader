@@ -158,11 +158,10 @@ namespace trader.Futures
                 if (file.Name.StartsWith(date.ToString("yyyy-MM-dd")))
                 {
                     files = new string[] {
-                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+".csv",
-                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+"-night.csv",
                         file.DirectoryName+"\\"+fn.Replace("-night.csv","")+".csv",
                         file.DirectoryName+"\\"+fn.Replace("-night.csv","")+"-night.csv",
-
+                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+".csv",
+                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+"-night.csv",
                     };
                 }
                 else
@@ -206,7 +205,34 @@ namespace trader.Futures
         {
             var dates = this.data.Keys.ToArray();
             var index = Array.IndexOf(dates, date);
-            return this.data[dates[index-1]];
+            if (index == 0)
+            {
+                var dir = this.sourceDir + "\\price\\5min\\" + period;
+                var yn = "";
+                foreach (var file in (new DirectoryInfo(dir)).GetFiles("*.csv"))
+                {
+                    if (file.Name.Substring(0, 10) == date.ToString("yyyy-MM-dd"))
+                    {
+                        if (yn != "")
+                        {
+                            date = DateTime.Parse(yn.Substring(0, 10));
+
+                        }
+
+                        break;
+                    }
+                    else
+                    {
+                        yn = file.Name;
+                    }
+                }
+
+                this.Get5MinK(date, period);
+                dates = this.data.Keys.ToArray();
+                index = Array.IndexOf(dates, date);
+            }
+
+            return this.data[dates[index - 1]];
         }
     }
 }

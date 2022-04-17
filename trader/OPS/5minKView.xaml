@@ -87,8 +87,8 @@
 
     <Grid Background="Black">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="30*"/>
-            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="25*"/>
+            <ColumnDefinition Width="75*"/>
         </Grid.ColumnDefinitions>
 
         <Grid Background="Gray"  Grid.Column="0">
@@ -146,8 +146,6 @@
                 <Label Content="時間:" FontSize="20" HorizontalAlignment="Center" Canvas.Top="80" VerticalAlignment="Top" Canvas.Left="2"/>
                 <TextBox x:Name="hour" FontSize="20" Canvas.Left="62" TextWrapping="Wrap" Text="13" Canvas.Top="83" Width="34" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="1.882,0.657"/>
                 <TextBox x:Name="minute" FontSize="20" TextWrapping="Wrap" Text="45" Canvas.Left="104" Canvas.Top="83" HorizontalAlignment="Center" VerticalAlignment="Top" Width="30" RenderTransformOrigin="0.194,0.474"/>
-                <Label Content="盤:" FontSize="20" Canvas.Top="115" HorizontalAlignment="Center" VerticalAlignment="Top" Width="53" Canvas.Left="2"/>
-                <ComboBox x:Name="mode" SelectedIndex="0" FontSize="20" Canvas.Left="62" Canvas.Top="118" Width="84" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <Button Content="執行" FontSize="20" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Canvas.Left="2" Canvas.Top="166" Width="155" Click="Button_Run_Click"/>
                 <Label Content="週別:" FontSize="20" HorizontalAlignment="Left" Canvas.Top="40" VerticalAlignment="Top" Canvas.Left="1"/>
                 <ComboBox x:Name="selectPeriodBox" ItemsSource="{Binding Path=Manage.Periods, ElementName=win}" FontSize="20" Canvas.Left="62" Canvas.Top="43" Width="120" HorizontalAlignment="Left" VerticalAlignment="Top"/>

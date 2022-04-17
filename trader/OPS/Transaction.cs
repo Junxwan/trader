@@ -17,13 +17,10 @@ namespace trader.OPS
 
         private Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>> data;
 
-        private Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>> nightData;
-
         public Transaction(string sourceDir)
         {
             this.sourceDir = sourceDir + "\\op";
             this.data = new Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>>();
-            this.nightData = new Dictionary<string, Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>>();
         }
 
         public bool ToMinPriceCsv(DateTime fileDate, string file, string[] periods, int min = 5, string type = "TXO")
@@ -192,125 +189,175 @@ namespace trader.OPS
             return true;
         }
 
-        private void Load(string period, DateTime dateTime)
+        //5分K資料
+        public SortedList<string, Dictionary<string, List<Csv.MinPrice>>> Get5MinK(string period, DateTime dateTime)
         {
             if (!this.data.ContainsKey(period))
             {
                 this.data[period] = new Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>();
             }
-
-            if (!this.data[period].ContainsKey(dateTime))
+            else if (this.data[period].ContainsKey(dateTime))
             {
-                this.data[period][dateTime] = new SortedList<string, Dictionary<string, List<Csv.MinPrice>>>();
-            }
-
-            if (this.data[period][dateTime].Count > 0)
-            {
-                return;
+                return this.data[period][dateTime];
             }
 
             var dir = this.sourceDir + "\\price\\5min\\" + period;
+            var files = new string[] { };
 
             foreach (var info in (new DirectoryInfo(dir)).GetDirectories())
             {
-                var op = new Dictionary<string, List<Csv.MinPrice>>();
                 var date = dateTime.ToString("yyyy-MM-dd");
-                op["call"] = new List<Csv.MinPrice>();
-                op["put"] = new List<Csv.MinPrice>();
-
-                foreach (var file in info.GetFiles(date + "*.csv"))
+                var fn = "";
+                foreach (var file in info.GetFiles("*.csv").OrderBy(f => f.Name))
                 {
-                    if ((file.Name[11] != 'P' && file.Name[11] != 'C') || file.Name.Contains("night"))
+                    if (file.Name.StartsWith(date))
+                    {
+                        var yd = fn == "" ? "" : fn.Substring(0, 10);
+
+                        files = new string[] {
+                        file.DirectoryName+"\\"+yd+"-P.csv",
+                        file.DirectoryName+"\\"+yd+"-P-night.csv",
+                        file.DirectoryName+"\\"+yd+"-C.csv",
+                        file.DirectoryName+"\\"+yd+"-C-night.csv",
+
+                        file.DirectoryName+"\\"+date+"-P.csv",
+                        file.DirectoryName+"\\"+date+"-P-night.csv",
+                        file.DirectoryName+"\\"+date+"-C.csv",
+                        file.DirectoryName+"\\"+date+"-C-night.csv"
+                        };
+                    }
+                    else
+                    {
+                        fn = file.Name;
+                    }
+                }
+
+                foreach (var file in files)
+                {
+                    if (!File.Exists(file))
                     {
                         continue;
                     }
 
-                    using var reader = new StreamReader(file.FullName);
+                    var name = Path.GetFileName(file);
+                    if ((name[11] != 'P' && name[11] != 'C'))
+                    {
+                        continue;
+                    }
+
+                    var k = DateTime.Parse(name.Substring(0, 10));
+                    if (!this.data[period].ContainsKey(k))
+                    {
+                        this.data[period][k] = new SortedList<string, Dictionary<string, List<Csv.MinPrice>>>();
+                    }
+
+                    if (!this.data[period][k].ContainsKey(info.Name))
+                    {
+                        var op = new Dictionary<string, List<Csv.MinPrice>>();
+                        op["call"] = new List<Csv.MinPrice>();
+                        op["put"] = new List<Csv.MinPrice>();
+
+                        this.data[period][k][info.Name] = op;
+                    }
+
+                    using var reader = new StreamReader(file);
                     using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
                     {
                         foreach (var item in csv.GetRecords<Csv.MinPrice>())
                         {
-                            switch (file.Name[11])
+                            switch (name[11])
                             {
                                 case 'P':
-                                    op["put"].Add(item);
+                                    this.data[period][k][info.Name]["put"].Add(item);
                                     break;
                                 case 'C':
-                                    op["call"].Add(item);
+                                    this.data[period][k][info.Name]["call"].Add(item);
                                     break;
                             }
                         }
                     }
                 }
-
-                this.data[period][dateTime].Add(info.Name, op);
-            }
-        }
-
-        private void LoadNight(string period, DateTime dateTime)
-        {
-            if (!this.nightData.ContainsKey(period))
-            {
-                this.nightData[period] = new Dictionary<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>();
             }
 
-            if (!this.nightData[period].ContainsKey(dateTime))
-            {
-                this.nightData[period][dateTime] = new SortedList<string, Dictionary<string, List<Csv.MinPrice>>>();
-            }
-
-            if (this.nightData[period][dateTime].Count > 0)
-            {
-                return;
-            }
-
-            var dir = this.sourceDir + "\\price\\5min\\" + period;
-
-            foreach (var info in (new DirectoryInfo(dir)).GetDirectories())
-            {
-                var op = new Dictionary<string, List<Csv.MinPrice>>();
-                var date = dateTime.ToString("yyyy-MM-dd");
-                op["call"] = new List<Csv.MinPrice>();
-                op["put"] = new List<Csv.MinPrice>();
-
-                foreach (var file in info.GetFiles(date + "*.csv"))
-                {
-                    if ((file.Name[11] != 'P' && file.Name[11] != 'C') || !file.Name.Contains("night"))
-                    {
-                        continue;
-                    }
-
-                    using var reader = new StreamReader(file.FullName);
-                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                    {
-                        foreach (var item in csv.GetRecords<Csv.MinPrice>())
-                        {
-                            switch (file.Name[11])
-                            {
-                                case 'P':
-                                    op["put"].Add(item);
-                                    break;
-                                case 'C':
-                                    op["call"].Add(item);
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                this.nightData[period][dateTime].Add(info.Name, op);
-            }
-        }
-
-        //5分K資料
-        public SortedList<string, Dictionary<string, List<Csv.MinPrice>>> Get5MinK(string period, DateTime dateTime, bool IsDayPlate = true)
-        {
-            this.Load(period, dateTime);
-            if (!IsDayPlate)
-            {
-                return this.nightData[period][dateTime];
-            }
             return this.data[period][dateTime];
+        }
+
+        public SortedList<string, Dictionary<string, List<Csv.MinPrice>>> PrevGet5MinK(string period, DateTime dateTime)
+        {
+            var dates = this.data[period].Keys.ToArray();
+            var index = Array.IndexOf(dates, dateTime);
+            if (index <= 0)
+            {
+                var dir = this.sourceDir + "\\price\\5min\\" + period;
+                var yn = "";
+                foreach (var file in (new DirectoryInfo(dir)).GetFiles("*.csv"))
+                {
+                    if (file.Name.Substring(0, 10) == dateTime.ToString("yyyy-MM-dd"))
+                    {
+                        if (yn != "")
+                        {
+                            dateTime = DateTime.Parse(yn.Substring(0, 10));
+
+                        }
+
+                        break;
+                    }
+                    else
+                    {
+                        yn = file.Name;
+                    }
+                }
+
+                this.Get5MinK(period, dateTime);
+                dates = this.data[period].Keys.ToArray();
+                index = Array.IndexOf(dates, dateTime);
+            }
+
+            return this.data[period][dates[index - 1]];
+        }
+
+        public Dictionary<string, Dictionary<string, Csv.MinPrice>> PrevGetLast5MinK(string period, DateTime dateTime, bool IsDayPlate = true)
+        {
+            var colsePrice = new Dictionary<string, Dictionary<string, Csv.MinPrice>>();
+            SortedList<string, Dictionary<string, List<Csv.MinPrice>>> data;
+            DateTime startDateTime;
+            DateTime endDateTime;
+
+            if (IsDayPlate)
+            {
+                data = this.PrevGet5MinK(period, dateTime);
+                var dates = this.data[period].Keys.ToArray();
+                var index = Array.IndexOf(dates, dateTime);
+                startDateTime = new DateTime(dates[index - 1].Year, dates[index - 1].Month, dates[index - 1].Day, 8, 45, 0);
+            }
+            else
+            {
+                data = this.Get5MinK(period, dateTime);
+                startDateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 8, 45, 0);
+            }
+
+            endDateTime = startDateTime.AddHours(5);
+
+            foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in data)
+            {
+                colsePrice[row.Key] = new Dictionary<string, Csv.MinPrice>();
+                colsePrice[row.Key]["call"] = new Csv.MinPrice();
+                colsePrice[row.Key]["put"] = new Csv.MinPrice();
+
+                foreach (var cp in new string[] { "call", "put" })
+                {
+                    foreach (var value in row.Value[cp])
+                    {
+                        if (value.DateTime >= startDateTime && value.DateTime <= endDateTime)
+                        {
+                            colsePrice[row.Key][cp].Close = value.Close;
+                            colsePrice[row.Key][cp].DateTime = value.DateTime;
+                        }
+                    }
+                }
+            }
+
+            return colsePrice;
         }
     }
 }

@@ -97,7 +97,6 @@ namespace trader.OPS
             InitializeComponent();
 
             this.datePicker.SelectedDate = DateTime.Now;
-            this.mode.ItemsSource = new string[] { "日", "夜" };
         }
 
         private void OnPropertyChanged(string propertyName)
@@ -110,11 +109,9 @@ namespace trader.OPS
 
         private void Button_Run_Click(object sender, RoutedEventArgs e)
         {
+            bool IsDayPlate = true;
             var date = DateTime.Parse(this.datePicker.Text);
-            var IsDayPlate = this.mode.Text == "日";
-            var data = this.Transaction.Get5MinK(this.selectPeriodBox.Text, date, IsDayPlate);
-            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
-            var endDateTime = startDateTime.AddHours(5);
+            var data = this.Transaction.Get5MinK(this.selectPeriodBox.Text, date);
             var watchs = new List<Watch>();
 
             var time = new DateTime(
@@ -124,6 +121,22 @@ namespace trader.OPS
                 0
                 );
 
+            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
+            var endDateTime = startDateTime.AddHours(5);
+
+            if (startDateTime > time || time > endDateTime)
+            {
+                IsDayPlate = false;
+            }
+
+            if (!IsDayPlate)
+            {
+                startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
+                endDateTime = startDateTime.AddHours(14);
+            }
+
+            var colsePrice = this.Transaction.PrevGetLast5MinK(this.selectPeriodBox.Text, date, IsDayPlate);
+
             foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in data)
             {
                 int CTotal = 0;
@@ -132,8 +145,6 @@ namespace trader.OPS
                 double PChange = 0;
                 double CPrice = 0;
                 double PPrice = 0;
-                Csv.MinPrice? COpen = null;
-                Csv.MinPrice? POpen = null;
 
                 foreach (var call in row.Value["call"])
                 {
@@ -142,12 +153,7 @@ namespace trader.OPS
                         continue;
                     }
 
-                    if (COpen == null)
-                    {
-                        COpen = call;
-                    }
-
-                    CChange = Math.Round(call.Close - COpen.Open, 2);
+                    CChange = Math.Round(call.Close - (colsePrice.ContainsKey(row.Key) ? colsePrice[row.Key]["call"].Close : 0), 2);
                     CPrice = call.Close;
                     CTotal += call.Volume;
                 }
@@ -159,12 +165,7 @@ namespace trader.OPS
                         continue;
                     }
 
-                    if (POpen == null)
-                    {
-                        POpen = put;
-                    }
-
-                    PChange = Math.Round(put.Close - POpen.Open, 2);
+                    PChange = Math.Round(put.Close - (colsePrice.ContainsKey(row.Key) ? colsePrice[row.Key]["put"].Close : 0), 2);
                     PPrice = put.Close;
                     PTotal += put.Volume;
                 }
@@ -183,10 +184,14 @@ namespace trader.OPS
 
             this.Data = watchs;
 
+            // ==============================台指期=============================================
+
             var fw = new FuturesWatch();
             fw.Name = "台指期";
             fw.Month = this.selectPeriodBox.Text.Substring(4, 2);
             var futures = this.Futures.Get5MinK(date, this.selectPeriodBox.Text);
+            List<Futures.MinPriceCsv> prevData;
+            DateTime CloseTime;
 
             foreach (var item in futures)
             {
@@ -196,18 +201,25 @@ namespace trader.OPS
                 }
             }
 
+            //拿上一收盤價
             if (IsDayPlate)
             {
-                var prevData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
-                var t = new DateTime(prevData[0].DateTime.Year, prevData[0].DateTime.Month, prevData[0].DateTime.Day, 13, 45, 0);
-                foreach (var item in prevData)
+                prevData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
+                CloseTime = new DateTime(prevData[0].DateTime.Year, prevData[0].DateTime.Month, prevData[0].DateTime.Day, 13, 45, 0);
+            }
+            else
+            {
+                CloseTime = new DateTime(date.Year, date.Month, date.Day, 13, 45, 0);
+                prevData = futures;
+            }
+
+            foreach (var item in prevData)
+            {
+                if (item.DateTime == CloseTime)
                 {
-                    if (item.DateTime == t)
-                    {
-                        fw.Change = fw.Price - item.Close;
-                        fw.Increase = Math.Round((fw.Change / item.Close) * 100, 2);
-                        break;
-                    }
+                    fw.Change = fw.Price - item.Close;
+                    fw.Increase = Math.Round((fw.Change / item.Close) * 100, 2);
+                    break;
                 }
             }
 
