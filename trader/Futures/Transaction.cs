@@ -70,12 +70,12 @@ namespace trader.Futures
                     DateTime = item.Value[0].DateTime.AddSeconds(-item.Value[0].DateTime.Second)
                 };
 
-                vv.DateTime = vv.DateTime.AddMinutes(5 - (item.Value[0].DateTime.Minute % 5));
+                vv.DateTime = vv.DateTime.AddMinutes(-(item.Value[0].DateTime.Minute % 5));
                 var data = new List<MinPriceCsv>();
 
                 foreach (var v in item.Value)
                 {
-                    if (vv.DateTime <= v.DateTime)
+                    if (v.DateTime.Subtract(vv.DateTime).TotalSeconds >= 300)
                     {
                         vv.Volume = vv.Volume / 2;
                         data.Add(vv);
@@ -89,7 +89,7 @@ namespace trader.Futures
                             DateTime = v.DateTime.AddSeconds(-v.DateTime.Second)
                         };
 
-                        vv.DateTime = vv.DateTime.AddMinutes(5 - (v.DateTime.Minute % 5));
+                        vv.DateTime = vv.DateTime.AddMinutes(-(v.DateTime.Minute % 5));
                     }
 
 
