@@ -423,14 +423,19 @@ namespace trader.OPS
             opChart.YAxisIndex = 0;
             opChart.XAxisIndex = 0;
 
-            var futuresChart = this.DiffPricesChart.Plot.AddScatter(dates, fPrices.ToArray(), label: "台指", color: System.Drawing.Color.Green);
+            var futuresChart = this.DiffPricesChart.Plot.AddScatter(dates, fPrices.ToArray(), label: "台指期", color: System.Drawing.Color.Green);
             futuresChart.YAxisIndex = 1;
             futuresChart.XAxisIndex = 0;
-            this.DiffPricesChart.Plot.YAxis2.Ticks(true);
 
+            this.DiffPricesChart.Plot.YAxis2.Ticks(true);
             this.DiffPricesChart.Plot.XAxis.ManualTickSpacing(12);
             this.DiffPricesChart.Plot.XAxis.DateTimeFormat(true);
             this.DiffPricesChart.Plot.Title(title);
+            this.DiffPricesChart.Plot.Legend();
+            this.DiffPricesChart.Plot.Style(ScottPlot.Style.Gray2);
+            this.DiffPricesChart.Plot.YAxis.Color(System.Drawing.Color.White);
+            this.DiffPricesChart.Plot.YAxis2.Color(System.Drawing.Color.White);
+            this.DiffPricesChart.Plot.XAxis.Color(System.Drawing.Color.White);
             this.DiffPricesChart.Refresh();
         }
     }
