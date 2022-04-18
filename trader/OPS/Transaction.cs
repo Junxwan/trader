@@ -113,12 +113,12 @@ namespace trader.OPS
                             DateTime = cp.Value[0].DateTime.AddSeconds(-cp.Value[0].DateTime.Second)
                         };
 
-                        vv.DateTime = vv.DateTime.AddMinutes(5 - (cp.Value[0].DateTime.Minute % 5));
+                        vv.DateTime = vv.DateTime.AddMinutes(-(cp.Value[0].DateTime.Minute % 5));
                         int index = 0;
 
                         foreach (var item in cp.Value)
-                        {
-                            if (vv.DateTime <= item.DateTime || index == cp.Value.Count - 1)
+                        {                            
+                            if (item.DateTime.Subtract(vv.DateTime).TotalSeconds >= 300 || index == cp.Value.Count - 1)
                             {
                                 vv.Volume = vv.Volume / 2;
                                 var date = vv.DateTime.ToString("yyyy-MM-dd");
@@ -138,9 +138,8 @@ namespace trader.OPS
                                     DateTime = item.DateTime.AddSeconds(-item.DateTime.Second)
                                 };
 
-                                vv.DateTime = vv.DateTime.AddMinutes(5 - (item.DateTime.Minute % 5));
+                                vv.DateTime = vv.DateTime.AddMinutes(-(item.DateTime.Minute % 5));
                             }
-
 
                             vv.Volume += item.Volume;
                             vv.Close = item.Price;
