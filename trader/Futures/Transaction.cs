@@ -228,19 +228,5 @@ namespace trader.Futures
 
             return value;
         }
-
-        public List<MinPriceCsv> PrevGet5MinK(DateTime date, string period)
-        {
-            this.LoadPriceFiles(period);
-
-            var index = Array.IndexOf(this.PriceDates[period].ToArray(), date.ToString("yyyy-MM-dd"));
-
-            if (index == -1)
-            {
-                return new List<MinPriceCsv>();
-            }
-
-            return this.Get5MinK(DateTime.Parse(this.PriceDates[period][index + 1]), period);
-        }
     }
 }

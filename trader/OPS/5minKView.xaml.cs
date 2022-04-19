@@ -432,35 +432,35 @@ namespace trader.OPS
         {
             this.LoadDiffPricesChart();
 
-            //if (this.selectCP.SelectedValue == null || this.Performances.SelectedValue == null)
-            //{
-            //    return;
-            //}
+            if (this.selectCP.SelectedValue == null || this.Performances.SelectedValue == null)
+            {
+                return;
+            }
 
-            //var cp = this.selectCP.SelectedValue.ToString();
-            //var date = DateTime.Parse(this.datePicker.Text);
-            //var data = this.Transaction.Get5MinKs(this.selectPeriodBox.Text, date, 7)[this.Performances.SelectedValue.ToString()];
-            //var t = TimeSpan.FromMinutes(5);
-            //OHLC[] prices = new OHLC[data[cp].Count];
+            var cp = this.selectCP.SelectedValue.ToString();
+            var date = DateTime.Parse(this.datePicker.Text);
+            var data = this.Transaction.Get5MinKRange(this.selectPeriodBox.Text, date.AddDays(-7), date)[this.Performances.SelectedValue.ToString()];
+            var t = TimeSpan.FromMinutes(5);
+            OHLC[] prices = new OHLC[data[cp].Count];
 
-            //for (int i = 0; i < data[cp].Count; i++)
-            //{
-            //    prices[i] = new OHLC(data[cp][i].Open, data[cp][i].High, data[cp][i].Low, data[cp][i].Close, data[cp][i].DateTime, t, data[cp][i].Volume);
-            //}
+            for (int i = 0; i < data[cp].Count; i++)
+            {
+                prices[i] = new OHLC(data[cp][i].Open, data[cp][i].High, data[cp][i].Low, data[cp][i].Close, data[cp][i].DateTime, t, data[cp][i].Volume);
+            }
 
-            //var candlePlot = this.KChart.Plot.AddCandlesticks(prices);
-            //candlePlot.ColorDown = ColorTranslator.FromHtml("#FFFFFF");
-            //candlePlot.ColorUp = ColorTranslator.FromHtml("#FF0000");
-            //this.KChart.Plot.Style(figureBackground: System.Drawing.Color.Black, dataBackground: System.Drawing.Color.Black);
-            //this.KChart.Plot.XAxis.TickLabelStyle(color: System.Drawing.Color.White);
-            //this.KChart.Plot.XAxis.TickMarkColor(ColorTranslator.FromHtml("#333333"));
-            //this.KChart.Plot.XAxis.MajorGrid(color: ColorTranslator.FromHtml("#333333"));
-            //this.KChart.Plot.YAxis.TickLabelStyle(color: System.Drawing.Color.White);
-            //this.KChart.Plot.YAxis.TickMarkColor(ColorTranslator.FromHtml("#333333"));
-            //this.KChart.Plot.YAxis.MajorGrid(color: ColorTranslator.FromHtml("#333333"));
+            var candlePlot = this.KChart.Plot.AddCandlesticks(prices);
+            candlePlot.ColorDown = ColorTranslator.FromHtml("#FFFFFF");
+            candlePlot.ColorUp = ColorTranslator.FromHtml("#FF0000");
+            this.KChart.Plot.Style(figureBackground: System.Drawing.Color.Black, dataBackground: System.Drawing.Color.Black);
+            this.KChart.Plot.XAxis.TickLabelStyle(color: System.Drawing.Color.White);
+            this.KChart.Plot.XAxis.TickMarkColor(ColorTranslator.FromHtml("#333333"));
+            this.KChart.Plot.XAxis.MajorGrid(color: ColorTranslator.FromHtml("#333333"));
+            this.KChart.Plot.YAxis.TickLabelStyle(color: System.Drawing.Color.White);
+            this.KChart.Plot.YAxis.TickMarkColor(ColorTranslator.FromHtml("#333333"));
+            this.KChart.Plot.YAxis.MajorGrid(color: ColorTranslator.FromHtml("#333333"));
 
-            //this.KChart.Plot.XAxis.DateTimeFormat(true);
-            //this.KChart.Refresh();
+            this.KChart.Plot.XAxis.DateTimeFormat(true);
+            this.KChart.Refresh();
         }
     }
 
