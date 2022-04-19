@@ -182,6 +182,7 @@
             </Grid.RowDefinitions>
             <Canvas Grid.Row="0">
                 <WpfPlot Name="DiffPricesChart" Height="400" Width="1200" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                <WpfPlot Name="KChart" Height="464" Width="1200" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="400" />
             </Canvas>
             <Canvas Grid.Row="1" Background="Gray">
                 <DatePicker x:Name="datePicker" Canvas.Left="60" Canvas.Top="5" FontSize="20"/>

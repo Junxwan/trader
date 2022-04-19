@@ -14,12 +14,18 @@ namespace trader.Futures
     {
         private readonly string sourceDir;
 
-        private SortedList<DateTime, List<MinPriceCsv>> data;
+        private readonly string priceDir;
+
+        private Dictionary<string, SortedList<DateTime, List<MinPriceCsv>>> data;
+
+        public Dictionary<string, List<string>> PriceDates;
 
         public Transaction(string sourceDir)
         {
             this.sourceDir = sourceDir + "\\futures";
-            this.data = new SortedList<DateTime, List<MinPriceCsv>>();
+            this.priceDir = this.sourceDir + "\\price\\5min\\";
+            this.data = new Dictionary<string, SortedList<DateTime, List<MinPriceCsv>>>();
+            this.PriceDates = new Dictionary<string, List<string>>();
         }
 
         public bool ToMinPriceCsv(string file, string periods, int min = 5, string type = "TX")
@@ -143,47 +149,56 @@ namespace trader.Futures
             return true;
         }
 
-        public List<MinPriceCsv> Get5MinK(DateTime date, string period)
+        public void LoadPriceFiles(string period)
         {
-            if (this.data.ContainsKey(date))
+            if (this.PriceDates.ContainsKey(period))
             {
-                return this.data[date];
+                return;
             }
 
-            var dir = this.sourceDir + "\\price\\5min\\" + period;
-            var files = new string[] { };
-            var fn = "";
+            this.PriceDates[period] = new List<string>();
+            var hash = new HashSet<string>();
+            var dir = this.priceDir + period;
             foreach (var file in (new DirectoryInfo(dir)).GetFiles("*.csv"))
             {
-                if (file.Name.StartsWith(date.ToString("yyyy-MM-dd")))
-                {
-                    files = new string[] {
-                        file.DirectoryName+"\\"+fn.Replace("-night.csv","")+".csv",
-                        file.DirectoryName+"\\"+fn.Replace("-night.csv","")+"-night.csv",
-                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+".csv",
-                        file.DirectoryName+"\\"+date.ToString("yyyy-MM-dd")+"-night.csv",
-                    };
-                }
-                else
-                {
-                    fn = file.Name;
-                }
+                hash.Add(file.Name.Substring(0, 10));
             }
+
+            this.PriceDates[period] = hash.ToList();
+            this.PriceDates[period].Sort((x, y) => -x.CompareTo(y));
+        }
+
+        public List<MinPriceCsv> Get5MinK(DateTime date, string period)
+        {
+            if (!this.data.ContainsKey(period))
+            {
+                this.data[period] = new SortedList<DateTime, List<MinPriceCsv>>();
+            }
+
+            if (this.data[period].ContainsKey(date))
+            {
+                return this.data[period][date];
+            }
+            else
+            {
+                this.data[period][date] = new List<MinPriceCsv>();
+            }
+
+            this.LoadPriceFiles(period);
+
+            if (!this.PriceDates[period].Contains(date.ToString("yyyy-MM-dd")))
+            {
+                return new List<MinPriceCsv>();
+            }
+
+            var files = new string[] {
+                this.priceDir+"\\"+period+"\\"+date.ToString("yyyy-MM-dd")+".csv",
+                this.priceDir+"\\"+period+"\\"+date.ToString("yyyy-MM-dd")+"-night.csv",
+            };
 
             foreach (var path in files)
             {
                 if (!File.Exists(path))
-                {
-                    continue;
-                }
-
-                var k = DateTime.Parse(Path.GetFileName(path).Substring(0, 10));
-
-                if (!this.data.ContainsKey(k))
-                {
-                    this.data[k] = new List<MinPriceCsv>();
-                }
-                else if (this.data[k].Count > 200)
                 {
                     continue;
                 }
@@ -193,46 +208,39 @@ namespace trader.Futures
                 {
                     foreach (var item in csv.GetRecords<MinPriceCsv>())
                     {
-                        this.data[k].Add(item);
+                        this.data[period][date].Add(item);
                     }
                 }
             }
 
-            return this.data[date];
+            return this.data[period][date];
+        }
+
+        public List<MinPriceCsv> Get5MinKRange(string period, DateTime startDate, DateTime endDate)
+        {
+            var date = new DateTime(startDate.Year, startDate.Month, startDate.Day);
+            var value = new List<MinPriceCsv>();
+
+            for (int i = 0; i <= Math.Round((endDate - startDate).TotalDays); i++)
+            {
+                value.AddRange(this.Get5MinK(date.AddDays(i), period));
+            }
+
+            return value;
         }
 
         public List<MinPriceCsv> PrevGet5MinK(DateTime date, string period)
         {
-            var dates = this.data.Keys.ToArray();
-            var index = Array.IndexOf(dates, date);
-            if (index == 0)
+            this.LoadPriceFiles(period);
+
+            var index = Array.IndexOf(this.PriceDates[period].ToArray(), date.ToString("yyyy-MM-dd"));
+
+            if (index == -1)
             {
-                var dir = this.sourceDir + "\\price\\5min\\" + period;
-                var yn = "";
-                foreach (var file in (new DirectoryInfo(dir)).GetFiles("*.csv"))
-                {
-                    if (file.Name.Substring(0, 10) == date.ToString("yyyy-MM-dd"))
-                    {
-                        if (yn != "")
-                        {
-                            date = DateTime.Parse(yn.Substring(0, 10));
-
-                        }
-
-                        break;
-                    }
-                    else
-                    {
-                        yn = file.Name;
-                    }
-                }
-
-                this.Get5MinK(date, period);
-                dates = this.data.Keys.ToArray();
-                index = Array.IndexOf(dates, date);
+                return new List<MinPriceCsv>();
             }
 
-            return this.data[dates[index - 1]];
+            return this.Get5MinK(DateTime.Parse(this.PriceDates[period][index + 1]), period);
         }
     }
 }

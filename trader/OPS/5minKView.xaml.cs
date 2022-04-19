@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -144,42 +145,25 @@ namespace trader.OPS
             var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
             var endDateTime = startDateTime.AddHours(5);
             bool IsDayPlate = (startDateTime > time || time > endDateTime) ? false : true;
-
-            var data = this.Transaction.Get5MinK(this.selectPeriodBox.Text, date);
             var watchs = new List<Watch>();
 
             if (!IsDayPlate)
             {
-                var pData = this.Transaction.PrevGet5MinK(this.selectPeriodBox.Text, date);
-                foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in data)
+                //當天夜盤
+                if (time.Hour >= 15 && time.Hour <= 23)
                 {
-                    if (pData.ContainsKey(row.Key))
-                    {
-                        pData[row.Key]["call"].AddRange(row.Value["call"]);
-                        pData[row.Key]["put"].AddRange(row.Value["put"]);
-                    }
-                    else
-                    {
-                        pData[row.Key] = row.Value;
-                    }
-                }
-
-                if (pData.First().Value["call"].Count > 0)
-                {
-                    date = DateTime.Parse(pData.First().Value["call"][0].DateTime.ToString("yyyy-MM-dd"));
+                    startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
+                    endDateTime = startDateTime.AddHours(14);
                 }
                 else
                 {
-                    date = DateTime.Parse(pData.First().Value["put"][0].DateTime.ToString("yyyy-MM-dd"));
+                    endDateTime = new DateTime(date.Year, date.Month, date.Day, 5, 0, 0);
+                    startDateTime = endDateTime.AddHours(-14);
                 }
-
-                startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
-                endDateTime = startDateTime.AddHours(14);
-
-                data = pData;
             }
 
-            var colsePrice = this.Transaction.PrevGetLast5MinK(this.selectPeriodBox.Text, date, IsDayPlate);
+            var data = this.Transaction.Get5MinKRange(this.selectPeriodBox.Text, startDateTime, endDateTime);
+            var colsePrice = this.Transaction.GetLast5MinK(this.selectPeriodBox.Text, new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day));
             var performances = new List<string>();
 
             foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in data)
@@ -193,7 +177,7 @@ namespace trader.OPS
 
                 foreach (var call in row.Value["call"])
                 {
-                    if (call.DateTime < startDateTime || call.DateTime > endDateTime || call.DateTime > time)
+                    if (call.DateTime < startDateTime || call.DateTime > endDateTime || call.DateTime >= time)
                     {
                         continue;
                     }
@@ -205,7 +189,7 @@ namespace trader.OPS
 
                 foreach (var put in row.Value["put"])
                 {
-                    if (put.DateTime < startDateTime || put.DateTime > endDateTime || put.DateTime > time)
+                    if (put.DateTime < startDateTime || put.DateTime > endDateTime || put.DateTime >= time)
                     {
                         continue;
                     }
@@ -230,7 +214,6 @@ namespace trader.OPS
             }
 
             this.Data = watchs;
-
             this.Performances.ItemsSource = performances;
 
             this.LoadVerticalWatchData();
@@ -238,6 +221,25 @@ namespace trader.OPS
 
         public void LoadFuturesWatch(DateTime date, DateTime time)
         {
+            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
+            var endDateTime = startDateTime.AddHours(5);
+            bool IsDayPlate = (startDateTime > time || time > endDateTime) ? false : true;
+            if (!IsDayPlate)
+            {
+                //當天夜盤
+                if (time.Hour >= 15 && time.Hour <= 23)
+                {
+                    startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
+                    endDateTime = startDateTime.AddHours(14);
+                }
+                else
+                {
+                    endDateTime = new DateTime(date.Year, date.Month, date.Day, 5, 0, 0);
+                    startDateTime = endDateTime.AddHours(-14);
+                }
+            }
+
+
             var fw = new FuturesWatch();
             fw.Name = "台指期";
             fw.Month = this.selectPeriodBox.Text.Substring(4, 2);
@@ -247,14 +249,14 @@ namespace trader.OPS
 
             foreach (var item in futures)
             {
-                if (item.DateTime <= time)
+                if (item.DateTime < time)
                 {
                     fw.Price = item.Close;
                 }
             }
 
-            prevData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
-            CloseTime = new DateTime(prevData[0].DateTime.Year, prevData[0].DateTime.Month, prevData[0].DateTime.Day, 13, 45, 0);
+            CloseTime = new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, 13, 40, 0);
+            prevData = this.Futures.Get5MinK(new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day), this.selectPeriodBox.Text);
 
             foreach (var item in prevData)
             {
@@ -309,26 +311,7 @@ namespace trader.OPS
             this.VerticalWatchData = watch;
         }
 
-        private void Button_Run_Click(object sender, RoutedEventArgs e)
-        {
-            var date = DateTime.Parse(this.datePicker.Text);
-            var time = new DateTime(
-                date.Year, date.Month, date.Day,
-                Convert.ToInt32(this.hour.Text.Trim()),
-                Convert.ToInt32(this.minute.Text.Trim()),
-                0
-                );
-
-            this.Load(date, time);
-            this.LoadFuturesWatch(date, time);
-        }
-
-        private void DiffPrices_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            this.LoadVerticalWatchData();
-        }
-
-        private void Performances_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void LoadDiffPricesChart()
         {
             if (this.selectCP.SelectedValue == null || this.Performances.SelectedValue == null)
             {
@@ -336,31 +319,19 @@ namespace trader.OPS
             }
 
             var date = DateTime.Parse(this.datePicker.Text);
-            var data = this.Transaction.PrevGet5MinK(this.selectPeriodBox.Text, date);
-
-            foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in this.Transaction.Get5MinK(this.selectPeriodBox.Text, date))
-            {
-                if (data.ContainsKey(row.Key))
-                {
-                    data[row.Key]["call"].AddRange(row.Value["call"]);
-                    data[row.Key]["put"].AddRange(row.Value["put"]);
-                }
-                else
-                {
-                    data[row.Key] = row.Value;
-                }
-            }
+            var fFates = this.Futures.PriceDates[this.selectPeriodBox.Text];
+            var data = this.Transaction.Get5MinKRange(this.selectPeriodBox.Text, date.AddDays(-7), date);
 
             string performance = this.Performances.SelectedValue.ToString();
             string prevPerformance = (Convert.ToInt32(performance) - Convert.ToInt32(this.diffPrices.Text)).ToString();
             string nextPerformance = (Convert.ToInt32(performance) + Convert.ToInt32(this.diffPrices.Text)).ToString();
-            var prices = new Dictionary<string, SortedList<DateTime, double>>();
+            var opPrices = new Dictionary<string, SortedList<DateTime, double>>();
             var cp = this.selectCP.SelectedValue.ToString();
             var title = "";
             int buyIndex = 0;
             List<Csv.MinPrice> sell;
             List<Csv.MinPrice> buy;
-            prices[cp] = new SortedList<DateTime, double>();
+            opPrices[cp] = new SortedList<DateTime, double>();
 
             if (cp == "call")
             {
@@ -370,9 +341,9 @@ namespace trader.OPS
             }
             else
             {
-                buy = data[performance][cp];
-                sell = data[prevPerformance][cp];
-                title = "賣權多差 Sell " + prevPerformance + " Buy " + performance + " 歷史價差";
+                sell = data[performance][cp];
+                buy = data[prevPerformance][cp];
+                title = "賣權多差 Sell " + performance + " Buy " + prevPerformance + " 歷史價差";
             }
 
             for (int i = 0; i < sell.Count; i++)
@@ -385,7 +356,7 @@ namespace trader.OPS
 
                     if (buy[ci].DateTime.Equals(sellDateTime))
                     {
-                        prices[cp][sellDateTime] = Math.Round(sell[i].Close - buy[ci].Close, 2);
+                        opPrices[cp][sellDateTime] = Math.Round(sell[i].Close - buy[ci].Close, 2);
                         break;
                     }
                     else if (buy[ci].DateTime > sellDateTime)
@@ -396,10 +367,9 @@ namespace trader.OPS
             }
 
             var fPrices = new List<double>();
-            var fData = this.Futures.PrevGet5MinK(date, this.selectPeriodBox.Text);
-            fData.AddRange(this.Futures.Get5MinK(date, this.selectPeriodBox.Text));
+            var fData = this.Futures.Get5MinKRange(this.selectPeriodBox.Text, date.AddDays(-7), date);
             var fIndex = 0;
-            foreach (var item in prices[cp].Keys)
+            foreach (var item in opPrices[cp].Keys)
             {
                 for (int i = fIndex; i < fData.Count; i++)
                 {
@@ -417,9 +387,9 @@ namespace trader.OPS
             }
 
             this.DiffPricesChart.Plot.Clear();
-            double[] positions = DataGen.Consecutive(prices[cp].Count);
-            double[] dates = prices[cp].Keys.Select(x => x.ToOADate()).ToArray();
-            var opChart = this.DiffPricesChart.Plot.AddScatter(dates, prices[cp].Values.ToArray(), label: cp, color: System.Drawing.Color.Red);
+            double[] positions = DataGen.Consecutive(opPrices[cp].Count);
+            double[] dates = opPrices[cp].Keys.Select(x => x.ToOADate()).ToArray();
+            var opChart = this.DiffPricesChart.Plot.AddScatter(dates, opPrices[cp].Values.ToArray(), label: cp, color: System.Drawing.Color.Red);
             opChart.YAxisIndex = 0;
             opChart.XAxisIndex = 0;
 
@@ -437,6 +407,60 @@ namespace trader.OPS
             this.DiffPricesChart.Plot.YAxis2.Color(System.Drawing.Color.White);
             this.DiffPricesChart.Plot.XAxis.Color(System.Drawing.Color.White);
             this.DiffPricesChart.Refresh();
+        }
+
+        private void Button_Run_Click(object sender, RoutedEventArgs e)
+        {
+            var date = DateTime.Parse(this.datePicker.Text);
+            var time = new DateTime(
+                date.Year, date.Month, date.Day,
+                Convert.ToInt32(this.hour.Text.Trim()),
+                Convert.ToInt32(this.minute.Text.Trim()),
+                0
+                );
+
+            this.LoadFuturesWatch(date, time);
+            this.Load(date, time);
+        }
+
+        private void DiffPrices_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.LoadVerticalWatchData();
+        }
+
+        private void Performances_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.LoadDiffPricesChart();
+
+            //if (this.selectCP.SelectedValue == null || this.Performances.SelectedValue == null)
+            //{
+            //    return;
+            //}
+
+            //var cp = this.selectCP.SelectedValue.ToString();
+            //var date = DateTime.Parse(this.datePicker.Text);
+            //var data = this.Transaction.Get5MinKs(this.selectPeriodBox.Text, date, 7)[this.Performances.SelectedValue.ToString()];
+            //var t = TimeSpan.FromMinutes(5);
+            //OHLC[] prices = new OHLC[data[cp].Count];
+
+            //for (int i = 0; i < data[cp].Count; i++)
+            //{
+            //    prices[i] = new OHLC(data[cp][i].Open, data[cp][i].High, data[cp][i].Low, data[cp][i].Close, data[cp][i].DateTime, t, data[cp][i].Volume);
+            //}
+
+            //var candlePlot = this.KChart.Plot.AddCandlesticks(prices);
+            //candlePlot.ColorDown = ColorTranslator.FromHtml("#FFFFFF");
+            //candlePlot.ColorUp = ColorTranslator.FromHtml("#FF0000");
+            //this.KChart.Plot.Style(figureBackground: System.Drawing.Color.Black, dataBackground: System.Drawing.Color.Black);
+            //this.KChart.Plot.XAxis.TickLabelStyle(color: System.Drawing.Color.White);
+            //this.KChart.Plot.XAxis.TickMarkColor(ColorTranslator.FromHtml("#333333"));
+            //this.KChart.Plot.XAxis.MajorGrid(color: ColorTranslator.FromHtml("#333333"));
+            //this.KChart.Plot.YAxis.TickLabelStyle(color: System.Drawing.Color.White);
+            //this.KChart.Plot.YAxis.TickMarkColor(ColorTranslator.FromHtml("#333333"));
+            //this.KChart.Plot.YAxis.MajorGrid(color: ColorTranslator.FromHtml("#333333"));
+
+            //this.KChart.Plot.XAxis.DateTimeFormat(true);
+            //this.KChart.Refresh();
         }
     }
 
