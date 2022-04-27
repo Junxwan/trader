@@ -9,6 +9,12 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="FuturesCostWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Futures\CostView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="OP5minKWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -32,6 +38,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="FuturesCostWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Futures\CostView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>

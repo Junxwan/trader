@@ -21,11 +21,24 @@ namespace trader.Futures
 
         private SortedList<DateTime, FuturesCsv> Data;
 
+        public List<string> Periods { get; private set; }
+
         public Price(string sourceDir)
         {
-            this.sourceDir = sourceDir;
+            this.sourceDir = sourceDir + "\\futures";
             this.filePath = this.sourceDir + "\\" + this.fileName + ".csv";
             this.Data = new SortedList<DateTime, FuturesCsv>();
+            this.LoadPeriods();
+        }
+
+        private void LoadPeriods()
+        {
+            this.Periods = new List<string>();
+            foreach (string path in Directory.GetDirectories(this.sourceDir + "\\cost"))
+            {
+                var info = new DirectoryInfo(path);
+                this.Periods.Add(info.Name);
+            }
         }
 
         public void Load()
@@ -56,7 +69,7 @@ namespace trader.Futures
             }
 
             this.Load();
-            
+
             if (this.Data.ContainsKey(datetime))
             {
                 return true;

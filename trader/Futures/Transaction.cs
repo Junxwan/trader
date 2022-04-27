@@ -20,6 +20,8 @@ namespace trader.Futures
 
         private Dictionary<string, SortedList<DateTime, List<MinPriceCsv>>> data;
 
+        private Dictionary<string, SortedList<DateTime, List<CostCsv>>> costData;
+
         public Dictionary<string, List<string>> PriceDates;
 
         public Transaction(string sourceDir)
@@ -28,6 +30,7 @@ namespace trader.Futures
             this.priceDir = this.sourceDir + "\\price\\5min\\";
             this.costDir = this.sourceDir + "\\cost";
             this.data = new Dictionary<string, SortedList<DateTime, List<MinPriceCsv>>>();
+            this.costData = new Dictionary<string, SortedList<DateTime, List<CostCsv>>>();
             this.PriceDates = new Dictionary<string, List<string>>();
         }
 
@@ -223,7 +226,7 @@ namespace trader.Futures
                             if (value.DateTime >= times[i, 0] && value.DateTime <= times[i, 1])
                             {
                                 volume += value.Volume;
-                                money += (int)(value.Volume * value.Price);                              
+                                money += (int)(value.Volume * value.Price);
                             }
                         }
 
@@ -336,5 +339,55 @@ namespace trader.Futures
 
             return value;
         }
+
+        public List<CostCsv> GetCost(DateTime date, string period)
+        {
+            if (!this.costData.ContainsKey(period))
+            {
+                this.costData[period] = new SortedList<DateTime, List<CostCsv>>();
+            }
+
+            if (!this.costData[period].ContainsKey(date))
+            {
+                this.costData[period][date] = new List<CostCsv>();
+
+                var file = this.costDir + "\\" + period + "\\" + date.ToString("yyyy-MM-dd") + ".csv";
+
+                if (!File.Exists(file))
+                {
+                    return new List<CostCsv>();
+                }
+
+                using var reader = new StreamReader(file);
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                {
+                    foreach (var item in csv.GetRecords<CostCsv>())
+                    {
+                        this.costData[period][date].Add(item);
+                    }
+                }
+            }
+
+            return this.costData[period][date];
+        }
+
+        public Dictionary<string, List<CostCsv>> GetCostRange(string period, DateTime startDate, DateTime endDate)
+        {
+            var date = new DateTime(startDate.Year, startDate.Month, startDate.Day);
+            var value = new Dictionary<string, List<CostCsv>>();
+
+            for (int i = 0; i <= Math.Round((endDate - startDate).TotalDays); i++)
+            {
+                var cost = this.GetCost(date.AddDays(i), period);
+
+                if (cost.Count > 0)
+                {
+                    value[date.AddDays(i).ToString("yyyy-MM-dd")] = cost;
+                }
+            }
+
+            return value;
+        }
+
     }
 }

@@ -27,7 +27,7 @@ namespace trader
             InitializeComponent();
             this.config = new Config();
             this.DataPath.Text = this.config.GetData("Path");
-            this.Futures = new Price(this.DataPath.Text + "\\futures");
+            this.Futures = new Price(this.DataPath.Text);
             this.OP = new Manage(this.DataPath.Text, this.Futures);
             this.Date.SelectedDate = DateTime.Now;
 
@@ -53,6 +53,13 @@ namespace trader
         private void Button_OP5minKWindow_Click(object sender, RoutedEventArgs e)
         {
             var op = new OP5minKWindow();
+            op.Show();
+        }
+
+        //打開市場期貨總成本
+        private void Button_FuturesCostWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var op = new FuturesCostWindow();
             op.Show();
         }
 

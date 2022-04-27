@@ -15,6 +15,9 @@
                 <MenuItem Header="當日未平倉變化" Click="Button_OPChangeWindow_Click"/>
                 <MenuItem Header="5minK" Click="Button_OP5minKWindow_Click"/>
             </MenuItem>
+            <MenuItem Header="期貨">
+                <MenuItem Header="市場期貨總成本" Click="Button_FuturesCostWindow_Click"/>
+            </MenuItem>
         </Menu>
         <Canvas>
             <TextBox x:Name="DataPath" FontSize="18"  Width="150" Height="30"/>

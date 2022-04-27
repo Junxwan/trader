@@ -26,7 +26,7 @@ namespace trader
         public OPChangeWindow()
         {
             var dataPath = (new Config()).GetData("Path");
-            OP = new Manage(dataPath, new Price(dataPath + "\\futures"));
+            OP = new Manage(dataPath, new Price(dataPath));
 
             InitializeComponent();
         }
