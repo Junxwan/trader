@@ -16,6 +16,8 @@ namespace trader.Futures
 
         private readonly string priceDir;
 
+        private readonly string costDir;
+
         private Dictionary<string, SortedList<DateTime, List<MinPriceCsv>>> data;
 
         public Dictionary<string, List<string>> PriceDates;
@@ -24,11 +26,12 @@ namespace trader.Futures
         {
             this.sourceDir = sourceDir + "\\futures";
             this.priceDir = this.sourceDir + "\\price\\5min\\";
+            this.costDir = this.sourceDir + "\\cost";
             this.data = new Dictionary<string, SortedList<DateTime, List<MinPriceCsv>>>();
             this.PriceDates = new Dictionary<string, List<string>>();
         }
 
-        public bool ToMinPriceCsv(string file, string periods, int min = 5, string type = "TX")
+        private Dictionary<string, List<TransactionCsv>> GetTransactionCsvs(string file, string? periods = null, string type = "TX")
         {
             var records = new Dictionary<string, List<TransactionCsv>>();
             using var reader = new StreamReader(file);
@@ -38,7 +41,12 @@ namespace trader.Futures
                 csv.ReadHeader();
                 while (csv.Read())
                 {
-                    if (csv.GetField(1).Trim() != type || periods != csv.GetField<string>(2).Trim())
+                    if (csv.GetField(1).Trim() != type)
+                    {
+                        continue;
+                    }
+
+                    if (periods != null && periods != csv.GetField<string>(2).Trim())
                     {
                         continue;
                     }
@@ -64,6 +72,13 @@ namespace trader.Futures
                     });
                 }
             }
+
+            return records;
+        }
+
+        public bool ToMinPriceCsv(string file, string periods, int min = 5, string type = "TX")
+        {
+            var records = this.GetTransactionCsvs(file, periods, type);
 
             foreach (KeyValuePair<string, List<TransactionCsv>> item in records)
             {
@@ -144,6 +159,99 @@ namespace trader.Futures
                 using var writer = new StreamWriter(f, false, Encoding.UTF8);
                 using var csvw = new CsvWriter(writer, csvConfig);
                 csvw.WriteRecords(data);
+            }
+
+            return true;
+        }
+
+        public bool ToCostCsv(string file, DateTime dateTime)
+        {
+            var csvs = new Dictionary<string, List<CostCsv>>();
+            var data = new Dictionary<string, Dictionary<string, List<TransactionCsv>>>();
+
+            foreach (KeyValuePair<string, List<TransactionCsv>> item in this.GetTransactionCsvs(file, null, "TX"))
+            {
+                data[item.Key] = new Dictionary<string, List<TransactionCsv>>();
+
+                foreach (var v in item.Value)
+                {
+                    if (!data[item.Key].ContainsKey(v.Period))
+                    {
+                        data[item.Key][v.Period] = new List<TransactionCsv>();
+                    }
+
+                    data[item.Key][v.Period].Add(v);
+                }
+            }
+
+            foreach (KeyValuePair<string, Dictionary<string, List<TransactionCsv>>> row in data)
+            {
+                foreach (KeyValuePair<string, List<TransactionCsv>> period in row.Value)
+                {
+                    if (period.Key.Length != 6)
+                    {
+                        continue;
+                    }
+
+                    if (!csvs.ContainsKey(period.Key))
+                    {
+                        csvs[period.Key] = new List<CostCsv>();
+                    }
+
+                    var times = new DateTime[3, 2] {
+                        {
+                            DateTime.Parse(row.Key+" 08:45:00"),
+                            DateTime.Parse(row.Key+" 08:45:00").AddHours(5),
+                        },
+                        {
+                            DateTime.Parse(row.Key+" 09:00:00"),
+                            DateTime.Parse(row.Key+" 13:30:00"),
+                        },
+                        {
+                            DateTime.Parse(row.Key+" 15:00:00"),
+                            DateTime.Parse(row.Key+" 15:00:00").AddHours(14),
+                        },
+                    };
+
+                    for (int i = 0; i < times.Length / 2; i++)
+                    {
+                        int volume = 0;
+                        Int64 money = 0;
+
+                        foreach (var value in period.Value)
+                        {
+                            if (value.DateTime >= times[i, 0] && value.DateTime <= times[i, 1])
+                            {
+                                volume += value.Volume;
+                                money += (int)(value.Volume * value.Price);                              
+                            }
+                        }
+
+                        csvs[period.Key].Add(new CostCsv()
+                        {
+                            Date = DateTime.Parse(row.Key),
+                            Period = period.Key,
+                            StartDateTime = times[i, 0],
+                            EndDateTime = times[i, 1],
+                            Volume = volume,
+                            Money = money,
+                        });
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<string, List<CostCsv>> item in csvs)
+            {
+                var dir = this.sourceDir + "\\cost\\" + item.Key;
+
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                using var writer = new StreamWriter(dir + "\\" + dateTime.ToString("yyyy-MM-dd") + ".csv", true, Encoding.UTF8);
+                using var csvw = new CsvWriter(writer, new CsvConfiguration(CultureInfo.CurrentCulture));
+                csvw.WriteRecords(item.Value);
             }
 
             return true;

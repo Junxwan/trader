@@ -26,6 +26,7 @@
             <Button Content="產生OP 5分K" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_OP_TO_5MinK_Click"/>
             <Button Content="產生台指 5分K" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_Futures_TO_5MinK_Click" HorizontalAlignment="Left" Canvas.Left="95" VerticalAlignment="Center"/>
             <ComboBox x:Name="opPeriods" Canvas.Left="140" Canvas.Top="39" Width="120" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button Content="產生台指成本" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_Futures_TO_Cost_Click" Canvas.Left="190" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         </Canvas>
     </DockPanel>
 </Window>

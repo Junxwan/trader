@@ -177,7 +177,7 @@ namespace trader.OPS
 
                 foreach (var call in row.Value["call"])
                 {
-                    if (call.DateTime < startDateTime || call.DateTime > endDateTime || call.DateTime >= time)
+                    if (call.DateTime < startDateTime || call.DateTime > endDateTime || call.DateTime > time)
                     {
                         continue;
                     }
@@ -189,7 +189,7 @@ namespace trader.OPS
 
                 foreach (var put in row.Value["put"])
                 {
-                    if (put.DateTime < startDateTime || put.DateTime > endDateTime || put.DateTime >= time)
+                    if (put.DateTime < startDateTime || put.DateTime > endDateTime || put.DateTime > time)
                     {
                         continue;
                     }
@@ -239,24 +239,23 @@ namespace trader.OPS
                 }
             }
 
-
             var fw = new FuturesWatch();
             fw.Name = "台指期";
-            fw.Month = this.selectPeriodBox.Text.Substring(4, 2);
-            var futures = this.Futures.Get5MinK(date, this.selectPeriodBox.Text);
+            fw.Month = this.selectFuturesPeriodBox.Text.Substring(4, 2);
+            var futures = this.Futures.Get5MinK(date, this.selectFuturesPeriodBox.Text);
             List<Futures.MinPriceCsv> prevData;
             DateTime CloseTime;
 
             foreach (var item in futures)
             {
-                if (item.DateTime < time)
+                if (item.DateTime <= time)
                 {
                     fw.Price = item.Close;
                 }
             }
 
             CloseTime = new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, 13, 40, 0);
-            prevData = this.Futures.Get5MinK(new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day), this.selectPeriodBox.Text);
+            prevData = this.Futures.Get5MinK(new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day), this.selectFuturesPeriodBox.Text);
 
             foreach (var item in prevData)
             {
@@ -319,7 +318,7 @@ namespace trader.OPS
             }
 
             var date = DateTime.Parse(this.datePicker.Text);
-            var fFates = this.Futures.PriceDates[this.selectPeriodBox.Text];
+            var fFates = this.Futures.PriceDates[this.selectFuturesPeriodBox.Text];
             var data = this.Transaction.Get5MinKRange(this.selectPeriodBox.Text, date.AddDays(-7), date);
 
             string performance = this.Performances.SelectedValue.ToString();
@@ -367,7 +366,7 @@ namespace trader.OPS
             }
 
             var fPrices = new List<double>();
-            var fData = this.Futures.Get5MinKRange(this.selectPeriodBox.Text, date.AddDays(-7), date);
+            var fData = this.Futures.Get5MinKRange(this.selectFuturesPeriodBox.Text, date.AddDays(-7), date);
             var fIndex = 0;
             foreach (var item in opPrices[cp].Keys)
             {

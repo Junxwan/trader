@@ -54,7 +54,7 @@ namespace trader
         {
             var op = new OP5minKWindow();
             op.Show();
-        }    
+        }
 
         //選擇資料目錄
         private void Button_OpenDataDir_Click(object sender, RoutedEventArgs e)
@@ -109,7 +109,7 @@ namespace trader
             var date = d.ToString("yyyy_MM_dd");
             var file = this.DataPath.Text + "\\op\\transaction\\OptionsDaily_" + date;
             ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
-            (new trader.OPS.Transaction(this.DataPath.Text)).ToMinPriceCsv(d, Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
+            (new OPS.Transaction(this.DataPath.Text)).ToMinPriceCsv(d, Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
             File.Delete(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv");
 
             System.Windows.MessageBox.Show("完成");
@@ -126,7 +126,25 @@ namespace trader
                 ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
             }
 
-            (new trader.Futures.Transaction(this.DataPath.Text)).ToMinPriceCsv(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv", this.opPeriods.Text);
+            (new Futures.Transaction(this.DataPath.Text)).ToMinPriceCsv(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv", this.opPeriods.Text);
+            File.Delete(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv");
+
+            System.Windows.MessageBox.Show("完成");
+        }
+
+        //產生台指成本
+        private void Button_Futures_TO_Cost_Click(object sender, RoutedEventArgs e)
+        {
+            var datetime = DateTime.Parse(this.Date.Text);
+            var date = datetime.ToString("yyyy_MM_dd");
+            var file = this.DataPath.Text + "\\futures\\transaction\\Daily_" + date;
+
+            if (!File.Exists(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv"))
+            {
+                ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
+            }
+
+            (new Futures.Transaction(this.DataPath.Text)).ToCostCsv(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv", datetime);
             File.Delete(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv");
 
             System.Windows.MessageBox.Show("完成");

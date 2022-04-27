@@ -22,6 +22,8 @@ namespace trader.OPS
 
         public List<string> Periods { get; private set; }
 
+        public List<string> FuturesPeriods { get; private set; }
+
         private readonly SortedList<string, Week> ops;
 
         private Price futures;
@@ -33,6 +35,7 @@ namespace trader.OPS
             this.ops = new SortedList<string, Week>();
             this.LoadDirectory();
             this.Periods = this.GetPeriods();
+            this.FuturesPeriods = this.GetFuturesPeriods();
         }
 
         private List<string> GetPeriods()
@@ -41,6 +44,22 @@ namespace trader.OPS
             foreach (var item in this.periodDirs.Keys)
             {
                 v.Add(item);
+            }
+
+            v.Reverse();
+
+            return v;
+        }
+
+        private List<string> GetFuturesPeriods()
+        {
+            var v = new List<string>();
+            foreach (var item in this.periodDirs.Keys)
+            {
+                if (item.Length == 6)
+                {
+                    v.Add(item);
+                }
             }
 
             v.Reverse();

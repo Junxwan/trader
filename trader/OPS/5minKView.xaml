@@ -197,6 +197,8 @@
                 <ComboBox x:Name="diffPrices" ItemsSource="{Binding Manage.Periods, ElementName=win}" FontSize="20" Canvas.Left="62" Canvas.Top="115" Width="90" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="DiffPrices_SelectionChanged"/>
                 <ComboBox x:Name="Performances" FontSize="20" Canvas.Left="157" Canvas.Top="115" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="Performances_SelectionChanged"/>
                 <ComboBox x:Name="selectCP" FontSize="20" Canvas.Left="312" Canvas.Top="116" Width="70" SelectionChanged="Performances_SelectionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Content="期貨:" FontSize="20" Canvas.Top="39" Canvas.Left="231" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <ComboBox x:Name="selectFuturesPeriodBox" ItemsSource="{Binding Manage.FuturesPeriods, ElementName=win}" FontSize="20" Canvas.Left="292" Canvas.Top="42" Width="160" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Canvas>
         </Grid>
     </Grid>
