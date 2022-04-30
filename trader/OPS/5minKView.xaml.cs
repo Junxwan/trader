@@ -457,7 +457,6 @@ namespace trader.OPS
             this.KChart.Plot.YAxis.TickLabelStyle(color: System.Drawing.Color.White);
             this.KChart.Plot.YAxis.TickMarkColor(ColorTranslator.FromHtml("#333333"));
             this.KChart.Plot.YAxis.MajorGrid(color: ColorTranslator.FromHtml("#333333"));
-
             this.KChart.Plot.XAxis.DateTimeFormat(true);
             this.KChart.Refresh();
         }

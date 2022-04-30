@@ -356,5 +356,40 @@ namespace trader.OPS
 
             return colsePrice;
         }
+
+        public List<string> GetFiles()
+        {
+            var files = new List<string>();
+            var dir = this.sourceDir + "\\transaction";
+            if (Directory.Exists(dir))
+            {
+                foreach (var file in (new DirectoryInfo(this.sourceDir + "\\transaction")).GetFiles("*.zip"))
+                {
+                    files.Add(file.Name);
+                }
+
+                files.Sort((x, y) => -x.CompareTo(y));
+            }
+
+            return files;
+        }
+
+        public List<string> Get5MinFiles(string period)
+        {
+            var files = new List<string>();
+            var dir = this.priceDir + period;
+
+            if (Directory.Exists(dir))
+            {
+                foreach (var file in (new DirectoryInfo(dir)).GetFiles("*.csv"))
+                {
+                    files.Add(file.Name);
+                }
+
+                files.Sort((x, y) => -x.CompareTo(y));
+            }
+
+            return files;
+        }
     }
 }

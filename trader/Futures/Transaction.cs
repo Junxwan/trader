@@ -252,7 +252,7 @@ namespace trader.Futures
                     Directory.CreateDirectory(dir);
                 }
 
-                using var writer = new StreamWriter(dir + "\\" + dateTime.ToString("yyyy-MM-dd") + ".csv", true, Encoding.UTF8);
+                using var writer = new StreamWriter(dir + "\\" + dateTime.ToString("yyyy-MM-dd") + ".csv", false, Encoding.UTF8);
                 using var csvw = new CsvWriter(writer, new CsvConfiguration(CultureInfo.CurrentCulture));
                 csvw.WriteRecords(item.Value);
             }
@@ -389,5 +389,38 @@ namespace trader.Futures
             return value;
         }
 
+        public List<string> GetFiles()
+        {
+            var files = new List<string>();
+            var dir = this.sourceDir + "\\transaction";
+            if (Directory.Exists(dir))
+            {
+                foreach (var file in (new DirectoryInfo(this.sourceDir + "\\transaction")).GetFiles("*.zip"))
+                {
+                    files.Add(file.Name);
+                }
+
+                files.Sort((x, y) => -x.CompareTo(y));
+            }
+
+            return files;
+        }
+
+        public List<string> Get5MinFiles(string period)
+        {
+            var files = new List<string>();
+            var dir = this.priceDir + "\\" + period;
+            if (Directory.Exists(dir))
+            {
+                foreach (var file in (new DirectoryInfo(this.priceDir + "\\" + period)).GetFiles("*.csv"))
+                {
+                    files.Add(file.Name);
+                }
+
+                files.Sort((x, y) => -x.CompareTo(y));
+            }
+
+            return files;
+        }
     }
 }

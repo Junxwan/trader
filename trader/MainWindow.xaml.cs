@@ -33,6 +33,10 @@ namespace trader
 
             opPeriods.ItemsSource = this.OP.Periods;
             opPeriods.SelectedIndex = 0;
+            
+            this.futuresDataFileDataGrid.ItemsSource = new Futures.Transaction(this.DataPath.Text).GetFiles();
+            this.futures5MinDataFileDataGrid.ItemsSource = new Futures.Transaction(this.DataPath.Text).Get5MinFiles(opPeriods.SelectedValue.ToString());
+            this.opDataFileDataGrid.ItemsSource = new OPS.Transaction(this.DataPath.Text).GetFiles();
         }
 
         //打開OP未平倉

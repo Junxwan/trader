@@ -30,6 +30,24 @@
             <Button Content="產生台指 5分K" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_Futures_TO_5MinK_Click" HorizontalAlignment="Left" Canvas.Left="95" VerticalAlignment="Center"/>
             <ComboBox x:Name="opPeriods" Canvas.Left="140" Canvas.Top="39" Width="120" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Button Content="產生台指成本" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_Futures_TO_Cost_Click" Canvas.Left="190" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <DataGrid x:Name="opDataFileDataGrid" AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Width="190" HorizontalAlignment="Center" Canvas.Top="152" VerticalAlignment="Top">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="OP成交明細" Binding="{Binding Path=.}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <DataGrid x:Name="futuresDataFileDataGrid" AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Width="135" HorizontalAlignment="Left" Canvas.Top="152" VerticalAlignment="Center" Canvas.Left="204">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="期貨成交明細" Binding="{Binding Path=.}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <DataGrid x:Name="futures5MinDataFileDataGrid" AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Width="140" HorizontalAlignment="Left" Canvas.Top="152" VerticalAlignment="Center" Canvas.Left="345">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="期貨5分K" Binding="{Binding Path=.}"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Canvas>
     </DockPanel>
 </Window>
