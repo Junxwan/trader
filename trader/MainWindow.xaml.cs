@@ -75,6 +75,13 @@ namespace trader
             op.Show();
         }
 
+        //打開OP權利金
+        private void Button_OPValueWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var op = new OPValue();
+            op.Show();
+        }
+
         //選擇資料目錄
         private void Button_OpenDataDir_Click(object sender, RoutedEventArgs e)
         {

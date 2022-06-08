@@ -1,0 +1,16 @@
+﻿<Window x:Class="trader.Page.OPValue"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:trader.Page"
+        mc:Ignorable="d"
+        Height="720" Width="1280"
+        Title="OP價值" WindowState="Maximized" WindowStartupLocation="CenterScreen" x:Name="thisWin" >
+    <Canvas Background="Gray">
+        <Label Content="週別:" FontSize="20"/>
+        <ComboBox x:Name="opPeriodsComboBox" Canvas.Left="55" Canvas.Top="2" Width="120" FontSize="20" SelectionChanged="opPeriodsComboBox_SelectionChanged"/>
+        <Label Content="日期:" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Canvas.Top="44"/>
+        <DatePicker x:Name="datePicker" Canvas.Left="55" Canvas.Top="46" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150"/>
+    </Canvas>
+</Window>

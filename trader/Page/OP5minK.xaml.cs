@@ -23,9 +23,9 @@ namespace trader.Page
     {
         public Manage OP { get; set; }
 
-        public trader.OPS.Transaction Transaction { get; set; }
+        public OPS.Transaction Transaction { get; set; }
 
-        public trader.Futures.Transaction Futures { get; set; }
+        public Futures.Transaction Futures { get; set; }
 
         public OP5minK()
         {

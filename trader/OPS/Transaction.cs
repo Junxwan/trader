@@ -172,6 +172,141 @@ namespace trader.OPS
                             if (fileDate.ToString("yyyy-MM-dd") != cdata.Key)
                             {
                                 f += "-night";
+                                var startTime = DateTime.Parse(cdata.Key + " 15:00:00");
+
+                                if (cdata.Value[0].DateTime != startTime)
+                                {
+                                    cdata.Value.Insert(0, new Csv.MinPrice()
+                                    {
+                                        DateTime = startTime,
+                                        Open = cdata.Value[0].Close,
+                                        Close = cdata.Value[0].Close,
+                                        High = cdata.Value[0].Close,
+                                        Low = cdata.Value[0].Close,
+                                    });
+                                }
+
+                                for (int i = 0; i < 108; i++)
+                                {
+                                    var d = startTime.AddMinutes(i * 5);
+
+                                    if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
+                                    {
+                                        cdata.Value.Insert(i, new Csv.MinPrice()
+                                        {
+                                            DateTime = d,
+                                            Open = cdata.Value[i - 1].Close,
+                                            Close = cdata.Value[i - 1].Close,
+                                            High = cdata.Value[i - 1].Close,
+                                            Low = cdata.Value[i - 1].Close,
+                                        });
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var startTime = DateTime.Parse(cdata.Key + " 08:45:00");
+
+                                if (cdata.Value[0].DateTime >= startTime)
+                                {
+                                    if (cdata.Value[0].DateTime != startTime)
+                                    {
+                                        cdata.Value.Insert(0, new Csv.MinPrice()
+                                        {
+                                            DateTime = startTime,
+                                            Open = cdata.Value[0].Close,
+                                            Close = cdata.Value[0].Close,
+                                            High = cdata.Value[0].Close,
+                                            Low = cdata.Value[0].Close,
+                                        });
+                                    }
+
+                                    for (int i = 0; i < 60; i++)
+                                    {
+                                        var d = startTime.AddMinutes(i * 5);
+
+                                        if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
+                                        {
+                                            cdata.Value.Insert(i, new Csv.MinPrice()
+                                            {
+                                                DateTime = d,
+                                                Open = cdata.Value[i - 1].Close,
+                                                Close = cdata.Value[i - 1].Close,
+                                                High = cdata.Value[i - 1].Close,
+                                                Low = cdata.Value[i - 1].Close,
+                                            });
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    startTime = DateTime.Parse(cdata.Key + " 00:00:00");
+
+                                    if (cdata.Value[0].DateTime != startTime)
+                                    {
+                                        cdata.Value.Insert(0, new Csv.MinPrice()
+                                        {
+                                            DateTime = startTime,
+                                            Open = cdata.Value[0].Close,
+                                            Close = cdata.Value[0].Close,
+                                            High = cdata.Value[0].Close,
+                                            Low = cdata.Value[0].Close,
+                                        });
+                                    }
+
+                                    for (int i = 0; i < 60; i++)
+                                    {
+                                        var d = startTime.AddMinutes(i * 5);
+
+                                        if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
+                                        {
+                                            cdata.Value.Insert(i, new Csv.MinPrice()
+                                            {
+                                                DateTime = d,
+                                                Open = cdata.Value[i - 1].Close,
+                                                Close = cdata.Value[i - 1].Close,
+                                                High = cdata.Value[i - 1].Close,
+                                                Low = cdata.Value[i - 1].Close,
+                                            });
+                                        }
+                                    }
+
+                                    startTime = DateTime.Parse(cdata.Key + " 08:45:00");
+
+                                    if (cdata.Value.Count <= 60)
+                                    {
+                                        break;
+                                    }
+
+                                    if (cdata.Value[60].DateTime != startTime)
+                                    {
+                                        cdata.Value.Insert(60, new Csv.MinPrice()
+                                        {
+                                            DateTime = startTime,
+                                            Open = cdata.Value[60].Close,
+                                            Close = cdata.Value[60].Close,
+                                            High = cdata.Value[60].Close,
+                                            Low = cdata.Value[60].Close,
+                                        });
+                                    }
+
+                                    for (int i = 60; i < 120; i++)
+                                    {
+                                        var d = startTime.AddMinutes((i - 60) * 5);
+
+                                        if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
+                                        {
+                                            cdata.Value.Insert(i, new Csv.MinPrice()
+                                            {
+                                                DateTime = d,
+                                                Open = cdata.Value[i - 1].Close,
+                                                Close = cdata.Value[i - 1].Close,
+                                                High = cdata.Value[i - 1].Close,
+                                                Low = cdata.Value[i - 1].Close,
+                                            });
+                                        }
+                                    }
+                                }
                             }
 
                             f += ".csv";

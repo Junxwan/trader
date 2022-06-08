@@ -39,6 +39,9 @@
     <Compile Update="Page\OPPosition.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Page\OPValue.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Page\FuturesCostAvg.xaml">
@@ -72,6 +75,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Page\OPPosition.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Page\OPValue.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
