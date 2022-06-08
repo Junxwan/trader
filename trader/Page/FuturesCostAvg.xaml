@@ -1,0 +1,20 @@
+﻿<Window x:Class="trader.Page.FuturesCostAvg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:trader"
+        mc:Ignorable="d"
+        xmlns:f="clr-namespace:trader.Futures"
+        Height="230" Width="505"
+        Title="計算期貨均線"  x:Name="thisWin" >
+    <Canvas>
+        <Label Content="均線:" Canvas.Left="5" Canvas.Top="15" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20"/>
+        <ComboBox x:Name="avgComboBox" Canvas.Left="65" Canvas.Top="17" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"/>
+        <Label Content="日期:" Canvas.Left="5" Canvas.Top="56" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <DatePicker x:Name="datePicker" Canvas.Left="65" Canvas.Top="56" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" Width="130"/>
+        <Button x:Name="runBtn" Content="計算" Canvas.Left="10" Canvas.Top="145" FontSize="20" Click="runBtn_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Label Content="價格:" Canvas.Left="5" Canvas.Top="96" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <TextBox x:Name="closePrice" Canvas.Left="65" TextWrapping="Wrap" Text="0" Canvas.Top="100" Width="120" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+    </Canvas>
+</Window>

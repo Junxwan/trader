@@ -17,6 +17,7 @@
             </MenuItem>
             <MenuItem Header="期貨">
                 <MenuItem Header="市場期貨總成本" Click="Button_FuturesCostWindow_Click"/>
+                <MenuItem Header="計算均線" Click="Button_FuturesCostAvgWindow_Click"/>
             </MenuItem>
         </Menu>
         <Canvas>

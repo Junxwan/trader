@@ -14,12 +14,12 @@ using System.Windows.Shapes;
 using trader.Futures;
 using trader.OPS;
 
-namespace trader
+namespace trader.Page
 {
     /// <summary>
     /// OP5minKWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class OP5minKWindow : Window
+    public partial class OP5minK : Window
     {
         public Manage OP { get; set; }
 
@@ -27,7 +27,7 @@ namespace trader
 
         public trader.Futures.Transaction Futures { get; set; }
 
-        public OP5minKWindow()
+        public OP5minK()
         {
             var dataPath = (new Config()).GetData("Path");
             OP = new Manage(dataPath, new Price(dataPath));

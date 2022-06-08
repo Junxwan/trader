@@ -14,16 +14,16 @@ using System.Windows.Shapes;
 using trader.OPS;
 using trader.Futures;
 
-namespace trader
+namespace trader.Page
 {
     /// <summary>
     /// OPWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class OPWindow : Window
+    public partial class OPPosition : Window
     {
         public Manage OP { get; set; }
 
-        public OPWindow()
+        public OPPosition()
         {
             var dataPath = (new Config()).GetData("Path");
             OP = new Manage(dataPath, new Price(dataPath));

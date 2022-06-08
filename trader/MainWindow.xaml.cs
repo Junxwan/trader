@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Forms;
 using trader.OPS;
 using trader.Futures;
+using trader.Page;
 using IniParser;
 using IniParser.Model;
 using System.IO;
@@ -42,28 +43,35 @@ namespace trader
         //打開OP未平倉
         private void Button_OPWindow_Click(object sender, RoutedEventArgs e)
         {
-            var op = new OPWindow();
+            var op = new OPPosition();
             op.Show();
         }
 
         //打開OP當日未平倉變化
         private void Button_OPChangeWindow_Click(object sender, RoutedEventArgs e)
         {
-            var op = new OPChangeWindow();
+            var op = new OPChange();
             op.Show();
         }
 
         //打開OP 5分K
         private void Button_OP5minKWindow_Click(object sender, RoutedEventArgs e)
         {
-            var op = new OP5minKWindow();
+            var op = new OP5minK();
             op.Show();
         }
 
         //打開市場期貨總成本
         private void Button_FuturesCostWindow_Click(object sender, RoutedEventArgs e)
         {
-            var op = new FuturesCostWindow();
+            var op = new FuturesCost();
+            op.Show();
+        }
+
+        //打開計算期貨均線
+        private void Button_FuturesCostAvgWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var op = new FuturesCostAvg();
             op.Show();
         }
 

@@ -11,23 +11,22 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using trader.Futures;
+using trader.OPS;
 
-namespace trader
+namespace trader.Page
 {
     /// <summary>
-    /// FuturesCostWindow.xaml 的互動邏輯
+    /// OPChangeWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class FuturesCostWindow : Window
+    public partial class OPChange : Window
     {
-        public Futures.Transaction Transaction { get; set; }
+        public Manage OP { get; set; }
 
-        public Futures.Price Price { get; set; }
-
-        public FuturesCostWindow()
+        public OPChange()
         {
             var dataPath = (new Config()).GetData("Path");
-            Transaction = new Futures.Transaction(dataPath);
-            Price = new Futures.Price(dataPath);
+            OP = new Manage(dataPath, new Price(dataPath));
 
             InitializeComponent();
         }

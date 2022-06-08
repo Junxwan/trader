@@ -9,16 +9,19 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="FuturesCostWindow.xaml.cs">
+    <Compile Update="Page\FuturesCostAvg.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Page\FuturesCost.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Futures\CostView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="OP5minKWindow.xaml.cs">
+    <Compile Update="Page\OP5minK.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="OPChangeWindow.xaml.cs">
+    <Compile Update="Page\OPChange.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="OPS\5minKView.xaml.cs">
@@ -33,12 +36,15 @@
     <Compile Update="OPS\View.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="OPWindow.xaml.cs">
+    <Compile Update="Page\OPPosition.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="FuturesCostWindow.xaml">
+    <Page Update="Page\FuturesCostAvg.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Page\FuturesCost.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Futures\CostView.xaml">
@@ -47,10 +53,10 @@
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="OP5minKWindow.xaml">
+    <Page Update="Page\OP5minK.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="OPChangeWindow.xaml">
+    <Page Update="Page\OPChange.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="OPS\5minKView.xaml">
@@ -65,7 +71,7 @@
     <Page Update="OPS\View.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="OPWindow.xaml">
+    <Page Update="Page\OPPosition.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

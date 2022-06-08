@@ -1,4 +1,4 @@
-﻿<Window x:Class="trader.OP5minKWindow"
+﻿<Window x:Class="trader.Page.OP5minK"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
