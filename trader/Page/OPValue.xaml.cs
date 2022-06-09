@@ -54,12 +54,29 @@ namespace trader.Page
 
             foreach (var period in data.Keys)
             {
+                var c = new OPS.Csv.MinPrice();
+                var p = new OPS.Csv.MinPrice();
+                var value = 0.0;
 
-            }
-            
-            foreach (KeyValuePair<string, Dictionary<string, List<OPS.Csv.MinPrice>>> row in data)
-            {
+                if (data[period]["call"].Count != data[period]["put"].Count)
+                {
+                    continue;
+                }
 
+                for (int i = 0; i < data[period]["call"].Count; i++)
+                {
+                    c = data[period]["call"][i];
+                    p = data[period]["put"][i];
+
+                    if (c.DateTime != p.DateTime)
+                    {
+                        continue;
+                    }
+
+                    value = c.Close + p.Close;
+
+
+                }
             }
         }
     }

@@ -50,6 +50,7 @@
                     <DataGridTextColumn Header="期貨5分K" Binding="{Binding Path=.}"/>
                 </DataGrid.Columns>
             </DataGrid>
+            <Button Content="產生OP權利金" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_OP_TO_Value_Click" HorizontalAlignment="Left" VerticalAlignment="Center" Canvas.Left="285"/>
         </Canvas>
     </DockPanel>
 </Window>

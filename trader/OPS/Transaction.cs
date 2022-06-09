@@ -13,7 +13,7 @@ namespace trader.OPS
     public class Transaction
     {
         //op資料目錄
-        private readonly string sourceDir;
+        public readonly string sourceDir;
 
         private readonly string priceDir;
 

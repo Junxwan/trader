@@ -23,6 +23,12 @@ namespace trader
 
         private Config config;
 
+        private Futures.Transaction FTransaction;
+
+        private OPS.Transaction OTransaction;
+
+        private OPS.Value OPValue;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -34,10 +40,14 @@ namespace trader
 
             opPeriods.ItemsSource = this.OP.Periods;
             opPeriods.SelectedIndex = 0;
-            
-            this.futuresDataFileDataGrid.ItemsSource = new Futures.Transaction(this.DataPath.Text).GetFiles();
-            this.futures5MinDataFileDataGrid.ItemsSource = new Futures.Transaction(this.DataPath.Text).Get5MinFiles(opPeriods.SelectedValue.ToString());
-            this.opDataFileDataGrid.ItemsSource = new OPS.Transaction(this.DataPath.Text).GetFiles();
+
+            FTransaction = new Futures.Transaction(this.DataPath.Text);
+            OTransaction = new OPS.Transaction(this.DataPath.Text);
+            OPValue = new Value(OTransaction, FTransaction);
+
+            this.futuresDataFileDataGrid.ItemsSource = FTransaction.GetFiles();
+            this.futures5MinDataFileDataGrid.ItemsSource = FTransaction.Get5MinFiles(opPeriods.SelectedValue.ToString());
+            this.opDataFileDataGrid.ItemsSource = OTransaction.GetFiles();
         }
 
         //打開OP未平倉
@@ -172,6 +182,21 @@ namespace trader
 
             (new Futures.Transaction(this.DataPath.Text)).ToCostCsv(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv", datetime);
             File.Delete(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv");
+
+            System.Windows.MessageBox.Show("完成");
+        }
+
+        //產生OP權利金
+        private void Button_OP_TO_Value_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OPValue.ToCsv(this.opPeriods.Text, DateTime.Parse(this.Date.Text));
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message);
+            }
 
             System.Windows.MessageBox.Show("完成");
         }
