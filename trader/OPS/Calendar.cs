@@ -57,5 +57,10 @@ namespace trader.OPS
         {
             return this.Get(OpPeriod).Start;
         }
+
+        public DateTime GetEndDate(string OpPeriod)
+        {
+            return this.Get(OpPeriod).End;
+        }
     }
 }

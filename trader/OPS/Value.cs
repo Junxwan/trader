@@ -35,31 +35,25 @@ namespace trader.OPS
             var csv = new List<Csv.Value>();
             var fd = this.FTransaction.Get5MinK(dateTime, this.Calendar.GetFutures(period));
             var opd = this.Transaction.Get5MinK(period, dateTime);
-            var opl = opd[opd.Keys[opd.Keys.Count / 2]]["call"].Count;
-
-            if (fd.Count != 228)
-            {
-                throw new Exception("期貨資料有誤:" + fd.Count);
-            }
+            DateTime startTime = dateTime;
+            DateTime endTime = dateTime.AddDays(1);
 
             if (this.Calendar.GetFirstDate(period) == dateTime)
             {
-                if (opl != 168)
-                {
-                    throw new Exception("op資料有誤:" + opl);
-                }
-
-                fd = fd.GetRange(60, 228 - 60);
+                startTime = dateTime.AddHours(8).AddMinutes(45);
             }
-            else if (dateTime.DayOfWeek == DayOfWeek.Friday)
-            {
 
-            }
-            else
+            if (this.Calendar.GetEndDate(period) == dateTime)
             {
-                if (fd.Count != opl)
+                endTime = dateTime.AddHours(13).AddMinutes(45);
+            }
+
+            var fdk = new Dictionary<DateTime, Double>();
+            foreach (var item in fd)
+            {
+                if (item.DateTime >= startTime && item.DateTime <= endTime)
                 {
-                    throw new Exception("期貨資料有誤: " + fd.Count + " op:" + opl);
+                    fdk[item.DateTime] = item.Close;
                 }
             }
 
@@ -68,12 +62,6 @@ namespace trader.OPS
             if (!Directory.Exists(pdir))
             {
                 Directory.CreateDirectory(pdir);
-            }
-
-            var fdk = new Dictionary<DateTime, Double>();
-            foreach (var item in fd)
-            {
-                fdk[item.DateTime] = item.Close;
             }
 
             foreach (var k in opd.Keys)

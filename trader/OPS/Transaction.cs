@@ -176,7 +176,7 @@ namespace trader.OPS
                                 int num = 108;
 
                                 //週五夜盤資料跨週六而周六沒有日盤比較特殊，只有60筆，一般夜盤會有108筆
-                                if (startTime.DayOfWeek == DayOfWeek.Friday)
+                                if (startTime.DayOfWeek == DayOfWeek.Saturday)
                                 {
                                     startTime = DateTime.Parse(cdata.Key + " 00:00:00");
                                     num = 60;
