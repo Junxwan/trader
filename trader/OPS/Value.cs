@@ -31,15 +31,36 @@ namespace trader.OPS
 
         public bool ToCsv(string period, DateTime dateTime)
         {
+            CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);
+            var csv = new List<Csv.Value>();
             var fd = this.FTransaction.Get5MinK(dateTime, this.Calendar.GetFutures(period));
             var opd = this.Transaction.Get5MinK(period, dateTime);
-            var csv = new List<Csv.Value>();
+            var opl = opd[opd.Keys[opd.Keys.Count / 2]]["call"].Count;
 
-            CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);
-
-            if ((fd.Count != 228) || (fd.Count != opd[opd.Keys[opd.Keys.Count / 2]]["call"].Count))
+            if (fd.Count != 228)
             {
-                throw new Exception("op跟期貨資料不一致 op:" + opd[opd.Keys[opd.Keys.Count / 2]]["call"].Count + " 期貨:" + fd.Count);
+                throw new Exception("期貨資料有誤:" + fd.Count);
+            }
+
+            if (this.Calendar.GetFirstDate(period) == dateTime)
+            {
+                if (opl != 168)
+                {
+                    throw new Exception("op資料有誤:" + opl);
+                }
+
+                fd = fd.GetRange(60, 228 - 60);
+            }
+            else if (dateTime.DayOfWeek == DayOfWeek.Friday)
+            {
+
+            }
+            else
+            {
+                if (fd.Count != opl)
+                {
+                    throw new Exception("期貨資料有誤: " + fd.Count + " op:" + opl);
+                }
             }
 
             var pdir = this.dir + "\\" + period;
@@ -49,19 +70,10 @@ namespace trader.OPS
                 Directory.CreateDirectory(pdir);
             }
 
-            var startTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 0, 0, 0);
-            if (this.Calendar.GetFirstDate(period) == dateTime)
-            {
-                startTime = startTime.AddHours(8).AddMinutes(45);
-            }
-
             var fdk = new Dictionary<DateTime, Double>();
             foreach (var item in fd)
             {
-                if (item.DateTime >= startTime)
-                {
-                    fdk[item.DateTime] = item.Close;
-                }
+                fdk[item.DateTime] = item.Close;
             }
 
             foreach (var k in opd.Keys)

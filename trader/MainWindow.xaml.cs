@@ -196,6 +196,7 @@ namespace trader
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message);
+                return;
             }
 
             System.Windows.MessageBox.Show("完成");

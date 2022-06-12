@@ -173,6 +173,14 @@ namespace trader.OPS
                             {
                                 f += "-night";
                                 var startTime = DateTime.Parse(cdata.Key + " 15:00:00");
+                                int num = 108;
+
+                                //週五夜盤資料跨週六而周六沒有日盤比較特殊，只有60筆，一般夜盤會有108筆
+                                if (startTime.DayOfWeek == DayOfWeek.Friday)
+                                {
+                                    startTime = DateTime.Parse(cdata.Key + " 00:00:00");
+                                    num = 60;
+                                }
 
                                 if (cdata.Value[0].DateTime != startTime)
                                 {
@@ -186,7 +194,7 @@ namespace trader.OPS
                                     });
                                 }
 
-                                for (int i = 0; i < 108; i++)
+                                for (int i = 0; i < num; i++)
                                 {
                                     var d = startTime.AddMinutes(i * 5);
 
