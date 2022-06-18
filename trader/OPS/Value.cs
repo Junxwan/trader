@@ -35,26 +35,14 @@ namespace trader.OPS
             var csv = new List<Csv.Value>();
             var fd = this.FTransaction.Get5MinK(dateTime, this.Calendar.GetFutures(period));
             var opd = this.Transaction.Get5MinK(period, dateTime);
-            DateTime startTime = dateTime;
-            DateTime endTime = dateTime.AddDays(1);
-
-            if (this.Calendar.GetFirstDate(period) == dateTime)
-            {
-                startTime = dateTime.AddHours(8).AddMinutes(45);
-            }
-
-            if (this.Calendar.GetEndDate(period) == dateTime)
-            {
-                endTime = dateTime.AddHours(13).AddMinutes(45);
-            }
+            var ok = fd[0].Close - fd[0].Close % 100;
+            DateTime startTime = opd[ok.ToString()]["put"][0].DateTime;
+            DateTime endTime = opd[ok.ToString()]["put"].Last().DateTime;
 
             var fdk = new Dictionary<DateTime, Double>();
             foreach (var item in fd)
             {
-                if (item.DateTime >= startTime && item.DateTime <= endTime)
-                {
-                    fdk[item.DateTime] = item.Close;
-                }
+                fdk[item.DateTime] = item.Close;
             }
 
             var pdir = this.dir + "\\" + period;
@@ -80,37 +68,38 @@ namespace trader.OPS
                             opk[v.DateTime] = new Dictionary<string, Csv.MinPrice>();
                         }
 
-
                         opk[v.DateTime][cp] = v;
                     }
                 }
 
-                foreach (var f in fdk)
+                foreach (var time in opk.Keys)
                 {
                     Double c = 0;
                     Double p = 0;
                     int cv = 0;
                     int pv = 0;
 
-                    if (opk.ContainsKey(f.Key))
+                    if (!fdk.ContainsKey(time))
                     {
-                        if (opk[f.Key].ContainsKey("call"))
-                        {
-                            c = opk[f.Key]["call"].Close;
-                            cv = opk[f.Key]["call"].Volume;
-                        }
+                        throw new Exception("缺少" + time.ToString() + "期貨資料");
+                    }
 
-                        if (opk[f.Key].ContainsKey("put"))
-                        {
-                            p = opk[f.Key]["put"].Close;
-                            pv = opk[f.Key]["put"].Volume;
-                        }
+                    if (opk[time].ContainsKey("call"))
+                    {
+                        c = opk[time]["call"].Close;
+                        cv = opk[time]["call"].Volume;
+                    }
+
+                    if (opk[time].ContainsKey("put"))
+                    {
+                        p = opk[time]["put"].Close;
+                        pv = opk[time]["put"].Volume;
                     }
 
                     csv.Add(new Csv.Value()
                     {
-                        Time = f.Key,
-                        Futures = f.Value,
+                        Time = time,
+                        Futures = fdk[time],
                         Call = c,
                         Put = p,
                         Call_Volume = cv,

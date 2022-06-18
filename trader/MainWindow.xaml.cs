@@ -143,7 +143,7 @@ namespace trader
         {
             var d = DateTime.Parse(this.Date.Text);
             var date = d.ToString("yyyy_MM_dd");
-            var file = this.DataPath.Text + "\\op\\transaction\\OptionsDaily_" + date;
+            var file = this.DataPath.Text + "\\op\\transaction\\OptionsDaily_" + date;        
             ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
             (new OPS.Transaction(this.DataPath.Text)).ToMinPriceCsv(d, Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
             File.Delete(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv");

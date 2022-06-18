@@ -105,6 +105,8 @@ namespace trader.OPS
 
                     foreach (KeyValuePair<string, List<Csv.Transaction>> cp in prow.Value)
                     {
+
+
                         if (cp.Value.Count == 0)
                         {
                             continue;
@@ -127,7 +129,7 @@ namespace trader.OPS
 
                         foreach (var item in cp.Value)
                         {
-                            if (item.DateTime.Subtract(vv.DateTime).TotalSeconds >= 300 || index == cp.Value.Count - 1)
+                            if (item.DateTime.Subtract(vv.DateTime).TotalSeconds >= 300)
                             {
                                 vv.Volume = vv.Volume / 2;
                                 var date = vv.DateTime.ToString("yyyy-MM-dd");
@@ -164,6 +166,20 @@ namespace trader.OPS
                             }
 
                             index++;
+                        }
+
+                        // 最後一筆
+                        if (index == cp.Value.Count)
+                        {
+                            vv.Volume = vv.Volume / 2;
+                            var date = vv.DateTime.ToString("yyyy-MM-dd");
+
+                            if (!minData.ContainsKey(date))
+                            {
+                                minData[date] = new List<Csv.MinPrice>();
+                            }
+
+                            minData[date].Add(vv);
                         }
 
                         CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);
