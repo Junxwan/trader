@@ -30,36 +30,44 @@ namespace trader.OPS.Csv
         [Index(4)]
         public Double Total { get { return Call + Put; } set { } }
 
-        //履約價
+        //Call成交量
         [Index(5)]
+        public int Call_Volume { get; set; }
+
+        //Put成交量
+        [Index(6)]
+        public Double Put_Volume { get; set; }
+
+        //履約價
+        [Index(7)]
         public int Price { get; set; }
 
         //週別
-        [Index(6)]
+        [Index(8)]
         public String Period { get; set; }
 
         //call可履約
-        [Index(7)]
+        [Index(9)]
         public bool Call_IS_Fulfillment { get { return Futures > Price; } set { } }
 
         //put可履約
-        [Index(8)]
+        [Index(10)]
         public bool Put_IS_Fulfillment { get { return Futures < Price; } set { } }
 
         //call價內價值
-        [Index(9)]
+        [Index(11)]
         public Double Call_In_Price_Value { get { return this.Call_IS_Fulfillment ? Futures - Price : 0; } set { } }
 
         //call時間價值
-        [Index(10)]
+        [Index(12)]
         public Double Call_Time_Price_Value { get { return Call - this.Call_In_Price_Value; } set { } }
 
         //put價內價值
-        [Index(11)]
+        [Index(13)]
         public Double Put_In_Price_Value { get { return this.Put_IS_Fulfillment ? Price - Futures : 0; } set { } }
 
         //put時間價值
-        [Index(12)]
+        [Index(14)]
         public Double Put_Time_Price_Value { get { return Put - this.Put_In_Price_Value; } set { } }
     }
 }

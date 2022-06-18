@@ -21,12 +21,15 @@ namespace trader.OPS
 
         private Dictionary<string, Dictionary<string, List<string>>> PriceDates;
 
+        private Calendar Calendar;
+
         public Transaction(string sourceDir)
         {
             this.sourceDir = sourceDir + "\\op";
             this.priceDir = this.sourceDir + "\\price\\5min\\";
             this.data = new Dictionary<string, SortedList<DateTime, SortedList<string, Dictionary<string, List<Csv.MinPrice>>>>>();
             this.PriceDates = new Dictionary<string, Dictionary<string, List<string>>>();
+            this.Calendar = new Calendar(this.sourceDir);
         }
 
         public bool ToMinPriceCsv(DateTime fileDate, string file, string[] periods, int min = 5, string type = "TXO")
@@ -168,152 +171,83 @@ namespace trader.OPS
                         foreach (KeyValuePair<string, List<Csv.MinPrice>> cdata in minData)
                         {
                             string f = pdir + "\\" + cdata.Key + "-" + cp.Key;
+                            DateTime startTime = new DateTime();
+                            DateTime endTime = new DateTime();
+                            int[] removeRange = new int[] { };
 
                             if (fileDate.ToString("yyyy-MM-dd") != cdata.Key)
                             {
                                 f += "-night";
-                                var startTime = DateTime.Parse(cdata.Key + " 15:00:00");
-                                int num = 108;
 
-                                //週五夜盤資料跨週六而周六沒有日盤比較特殊，只有60筆，一般夜盤會有108筆
+                                // 夜盤資料是1500-0000
+                                startTime = DateTime.Parse(cdata.Key + " 15:00:00");
+                                endTime = startTime.AddHours(9);
+
+                                // 如果夜盤資料是週六，則只會有0000-0455資料
                                 if (startTime.DayOfWeek == DayOfWeek.Saturday)
                                 {
                                     startTime = DateTime.Parse(cdata.Key + " 00:00:00");
-                                    num = 60;
+                                    endTime = startTime.AddHours(5);
                                 }
+                            }
 
-                                if (cdata.Value[0].DateTime != startTime)
-                                {
-                                    cdata.Value.Insert(0, new Csv.MinPrice()
-                                    {
-                                        DateTime = startTime,
-                                        Open = cdata.Value[0].Close,
-                                        Close = cdata.Value[0].Close,
-                                        High = cdata.Value[0].Close,
-                                        Low = cdata.Value[0].Close,
-                                    });
-                                }
-
-                                for (int i = 0; i < num; i++)
-                                {
-                                    var d = startTime.AddMinutes(i * 5);
-
-                                    if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
-                                    {
-                                        cdata.Value.Insert(i, new Csv.MinPrice()
-                                        {
-                                            DateTime = d,
-                                            Open = cdata.Value[i - 1].Close,
-                                            Close = cdata.Value[i - 1].Close,
-                                            High = cdata.Value[i - 1].Close,
-                                            Low = cdata.Value[i - 1].Close,
-                                        });
-                                    }
-                                }
+                            // 開倉日資料只有0845-1345
+                            else if (Calendar.GetFirstDate(row.Key) == DateTime.Parse(cdata.Key))
+                            {
+                                startTime = DateTime.Parse(cdata.Key + " 08:45:00");
+                                endTime = startTime.AddHours(5);
                             }
                             else
                             {
-                                var startTime = DateTime.Parse(cdata.Key + " 08:45:00");
+                                startTime = DateTime.Parse(cdata.Key + " 00:00:00");
+                                endTime = startTime.AddHours(13).AddMinutes(45);
 
-                                if (cdata.Value[0].DateTime >= startTime)
+                                // 移除0500-0840
+                                removeRange = new int[] {
+                                    (int)(startTime.AddHours(5)-startTime).TotalMinutes/5,
+                                    (int)(startTime.AddHours(8).AddMinutes(45)-startTime.AddHours(5)).TotalMinutes/5,
+                                };
+                            }
+
+                            // 如果沒有開盤資料則用最近一筆
+                            if (cdata.Value[0].DateTime != startTime)
+                            {
+                                cdata.Value.Insert(0, new Csv.MinPrice()
                                 {
-                                    if (cdata.Value[0].DateTime != startTime)
-                                    {
-                                        cdata.Value.Insert(0, new Csv.MinPrice()
-                                        {
-                                            DateTime = startTime,
-                                            Open = cdata.Value[0].Close,
-                                            Close = cdata.Value[0].Close,
-                                            High = cdata.Value[0].Close,
-                                            Low = cdata.Value[0].Close,
-                                        });
-                                    }
+                                    DateTime = startTime,
+                                    Open = cdata.Value[0].Close,
+                                    Close = cdata.Value[0].Close,
+                                    High = cdata.Value[0].Close,
+                                    Low = cdata.Value[0].Close,
+                                });
+                            }
 
-                                    for (int i = 0; i < 60; i++)
-                                    {
-                                        var d = startTime.AddMinutes(i * 5);
+                            // 回補缺失的時間資料
+                            for (int i = 0; i < (endTime - startTime).TotalMinutes / 5; i++)
+                            {
+                                var d = startTime.AddMinutes(i * 5);
 
-                                        if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
-                                        {
-                                            cdata.Value.Insert(i, new Csv.MinPrice()
-                                            {
-                                                DateTime = d,
-                                                Open = cdata.Value[i - 1].Close,
-                                                Close = cdata.Value[i - 1].Close,
-                                                High = cdata.Value[i - 1].Close,
-                                                Low = cdata.Value[i - 1].Close,
-                                            });
-                                        }
-                                    }
+                                if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
+                                {
+                                    cdata.Value.Insert(i, new Csv.MinPrice()
+                                    {
+                                        DateTime = d,
+                                        Open = cdata.Value[i - 1].Close,
+                                        Close = cdata.Value[i - 1].Close,
+                                        High = cdata.Value[i - 1].Close,
+                                        Low = cdata.Value[i - 1].Close,
+                                    });
                                 }
-                                else
+                            }
+
+                            // 移除多回補的資料
+                            if (removeRange.Length > 0)
+                            {
+                                cdata.Value.RemoveRange(removeRange[0], removeRange[1]);
+
+                                if (removeRange.Length == 4)
                                 {
-                                    startTime = DateTime.Parse(cdata.Key + " 00:00:00");
-
-                                    if (cdata.Value[0].DateTime != startTime)
-                                    {
-                                        cdata.Value.Insert(0, new Csv.MinPrice()
-                                        {
-                                            DateTime = startTime,
-                                            Open = cdata.Value[0].Close,
-                                            Close = cdata.Value[0].Close,
-                                            High = cdata.Value[0].Close,
-                                            Low = cdata.Value[0].Close,
-                                        });
-                                    }
-
-                                    for (int i = 0; i < 60; i++)
-                                    {
-                                        var d = startTime.AddMinutes(i * 5);
-
-                                        if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
-                                        {
-                                            cdata.Value.Insert(i, new Csv.MinPrice()
-                                            {
-                                                DateTime = d,
-                                                Open = cdata.Value[i - 1].Close,
-                                                Close = cdata.Value[i - 1].Close,
-                                                High = cdata.Value[i - 1].Close,
-                                                Low = cdata.Value[i - 1].Close,
-                                            });
-                                        }
-                                    }
-
-                                    startTime = DateTime.Parse(cdata.Key + " 08:45:00");
-
-                                    if (cdata.Value.Count <= 60)
-                                    {
-                                        break;
-                                    }
-
-                                    if (cdata.Value[60].DateTime != startTime)
-                                    {
-                                        cdata.Value.Insert(60, new Csv.MinPrice()
-                                        {
-                                            DateTime = startTime,
-                                            Open = cdata.Value[60].Close,
-                                            Close = cdata.Value[60].Close,
-                                            High = cdata.Value[60].Close,
-                                            Low = cdata.Value[60].Close,
-                                        });
-                                    }
-
-                                    for (int i = 60; i < 120; i++)
-                                    {
-                                        var d = startTime.AddMinutes((i - 60) * 5);
-
-                                        if (cdata.Value.Count <= i || cdata.Value[i].DateTime != d)
-                                        {
-                                            cdata.Value.Insert(i, new Csv.MinPrice()
-                                            {
-                                                DateTime = d,
-                                                Open = cdata.Value[i - 1].Close,
-                                                Close = cdata.Value[i - 1].Close,
-                                                High = cdata.Value[i - 1].Close,
-                                                Low = cdata.Value[i - 1].Close,
-                                            });
-                                        }
-                                    }
+                                    cdata.Value.RemoveRange(removeRange[2], removeRange[3]);
                                 }
                             }
 

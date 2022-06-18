@@ -31,8 +31,8 @@ namespace trader.Page
         {
             var dataPath = (new Config()).GetData("Path");
             OP = new Manage(dataPath, new Price(dataPath));
-            Transaction = new trader.OPS.Transaction(dataPath);
-            Futures = new trader.Futures.Transaction(dataPath);
+            Transaction = new OPS.Transaction(dataPath);
+            Futures = new Futures.Transaction(dataPath);
 
             InitializeComponent();
         }

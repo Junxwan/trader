@@ -89,11 +89,22 @@ namespace trader.OPS
                 {
                     Double c = 0;
                     Double p = 0;
+                    int cv = 0;
+                    int pv = 0;
 
                     if (opk.ContainsKey(f.Key))
                     {
-                        c = opk[f.Key].ContainsKey("call") ? opk[f.Key]["call"].Close : 0;
-                        p = opk[f.Key].ContainsKey("put") ? opk[f.Key]["put"].Close : 0;
+                        if (opk[f.Key].ContainsKey("call"))
+                        {
+                            c = opk[f.Key]["call"].Close;
+                            cv = opk[f.Key]["call"].Volume;
+                        }
+
+                        if (opk[f.Key].ContainsKey("put"))
+                        {
+                            p = opk[f.Key]["put"].Close;
+                            pv = opk[f.Key]["put"].Volume;
+                        }
                     }
 
                     csv.Add(new Csv.Value()
@@ -102,6 +113,8 @@ namespace trader.OPS
                         Futures = f.Value,
                         Call = c,
                         Put = p,
+                        Call_Volume = cv,
+                        Put_Volume = pv,
                         Period = period,
                         Price = ik,
                     });
@@ -129,6 +142,11 @@ namespace trader.OPS
             }
 
             return true;
+        }
+
+        public void Get(string period, DateTime startTime)
+        {
+
         }
     }
 }

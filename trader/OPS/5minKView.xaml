@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:trader.OPS"
              xmlns:c="clr-namespace:trader.OPS.Converter"
+             Height="1080" Width="1920"
              mc:Ignorable="d" x:Name="win">
 
     <UserControl.Resources>
@@ -147,9 +148,9 @@
             <DataGrid Grid.Row="0" ItemsSource="{Binding Path=VerticalHeaders, ElementName=win}"  AutoGenerateColumns="False" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Margin="-6 0 0 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Call" Width="40*" Binding="{Binding BCall}"/>
-                    <DataGridTextColumn Header="" Width="20*" />
-                    <DataGridTextColumn Header="Put" Width="40*" Binding="{Binding SPut}"/>
+                    <DataGridTextColumn Header="" Width="40*" Binding="{Binding BCall}"/>
+                    <DataGridTextColumn Header="Call" Width="20*" />
+                    <DataGridTextColumn Header="" Width="40*" Binding="{Binding SPut}"/>
                 </DataGrid.Columns>
             </DataGrid>
 
