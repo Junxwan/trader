@@ -11,7 +11,7 @@ using trader.Futures;
 
 namespace trader.OPS
 {
-    public class Value
+    public class Tick
     {
         public Transaction Transaction;
 
@@ -21,7 +21,11 @@ namespace trader.OPS
 
         private string dir;
 
-        public Value(Transaction Transaction, Futures.Transaction FTransaction)
+        private Dictionary<string, Dictionary<string, SortedDictionary<int, List<Csv.Tick>>>> data = new Dictionary<string, Dictionary<string, SortedDictionary<int, List<Csv.Tick>>>>();
+
+        private Dictionary<string, Dictionary<DateTime, SortedDictionary<int, Csv.Tick>>> TickData = new Dictionary<string, Dictionary<DateTime, SortedDictionary<int, Csv.Tick>>>();
+
+        public Tick(Transaction Transaction, Futures.Transaction FTransaction)
         {
             this.Transaction = Transaction;
             this.FTransaction = FTransaction;
@@ -32,7 +36,7 @@ namespace trader.OPS
         public bool ToCsv(string period, DateTime dateTime)
         {
             CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture);
-            var csv = new List<Csv.Value>();
+            var csv = new List<Csv.Tick>();
             var fd = this.FTransaction.Get5MinK(dateTime, this.Calendar.GetFutures(period));
             var opd = this.Transaction.Get5MinK(period, dateTime);
             var ok = fd[0].Close - fd[0].Close % 100;
@@ -96,7 +100,7 @@ namespace trader.OPS
                         pv = opk[time]["put"].Volume;
                     }
 
-                    csv.Add(new Csv.Value()
+                    csv.Add(new Csv.Tick()
                     {
                         Time = time,
                         Futures = fdk[time],
@@ -133,9 +137,70 @@ namespace trader.OPS
             return true;
         }
 
-        public void Get(string period, DateTime startTime)
+        public SortedDictionary<int, Csv.Tick> GetTime(string period, DateTime time)
         {
+            var sourceDir = this.dir + "\\" + period;
+            var date = time.ToString("yyyy-MM-dd");
 
+            if (!this.data.ContainsKey(period))
+            {
+                this.data[period] = new Dictionary<string, SortedDictionary<int, List<Csv.Tick>>>();
+            }
+
+            if (!this.data[period].ContainsKey(date))
+            {
+                this.data[period][date] = new SortedDictionary<int, List<Csv.Tick>>();
+
+                foreach (var info in (new DirectoryInfo(sourceDir)).GetDirectories())
+                {
+                    foreach (var f in info.GetFiles())
+                    {
+                        if (f.Name == date + ".csv")
+                        {
+                            using var reader = new StreamReader(f.FullName);
+                            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                            {
+                                this.data[period][date][Convert.ToInt32(info.Name)] = csv.GetRecords<Csv.Tick>().ToList();
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!this.TickData.ContainsKey(period))
+            {
+                this.TickData[period] = new Dictionary<DateTime, SortedDictionary<int, Csv.Tick>>();
+            }
+
+            if (!this.TickData[period].ContainsKey(time))
+            {
+                var t = DateTime.Parse(date);
+                for (int i = 0; i < 288; i++)
+                {
+                    this.TickData[period][t.AddMinutes(i * 5)] = new SortedDictionary<int, Csv.Tick>();
+                }
+
+                foreach (var item in this.data[period][date])
+                {
+                    foreach (var v in item.Value)
+                    {
+                        this.TickData[period][v.Time][item.Key] = v;
+                    }
+                }
+            }
+
+            return this.TickData[period][time];
+        }
+
+        public List<SortedDictionary<int, Csv.Tick>> GetRange(string period, DateTime startDate, DateTime EndDate)
+        {
+            var data = new List<SortedDictionary<int, Csv.Tick>>();
+            for (int i = 0; i <= (EndDate - startDate).TotalMinutes / 5; i++)
+            {
+                data.Add(this.GetTime(period, startDate.AddMinutes(i * 5)));
+            }
+
+            return data;
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace trader.OPS.Csv
 {
-    public class Value
+    public class Tick
     {
         //時間
         [Format("yyyy-MM-dd HH:mm:ss")]
@@ -36,7 +36,7 @@ namespace trader.OPS.Csv
 
         //Put成交量
         [Index(6)]
-        public Double Put_Volume { get; set; }
+        public int Put_Volume { get; set; }
 
         //履約價
         [Index(7)]

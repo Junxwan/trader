@@ -165,13 +165,12 @@
                 <Border Grid.Column="2" Background="Red"/>
             </Grid>
 
-            <DataGrid Grid.Row="2" x:Name="verticalDataGrid" ItemsSource="{Binding Path=VerticalWatchData, ElementName=win}" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid Grid.Row="2" x:Name="verticalDataGrid" ItemsSource="{Binding Path=CallPriceDiffWatchData, ElementName=win}" AutoGenerateColumns="False" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Margin="-6 0 0 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding Call}" />
-                    <DataGridTextColumn Header="履約價" Width="25*" Binding="{Binding CPerformance}"/>
-                    <DataGridTextColumn Header="履約價" Width="25*" Binding="{Binding PPerformance}"/>
-                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding Put}"/>
+                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding SB}" />
+                    <DataGridTextColumn Header="履約價" Width="25*" Binding="{Binding Performance}"/>
+                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding BS}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -190,7 +189,7 @@
                 <Label Content="日期:" HorizontalAlignment="Left" FontSize="20" Margin="0,5,0,0" VerticalAlignment="Top"/>
                 <Label Content="時間:" FontSize="20" HorizontalAlignment="Center" Canvas.Top="80" VerticalAlignment="Top" Canvas.Left="2"/>
                 <TextBox x:Name="hour" FontSize="20" Canvas.Left="62" TextWrapping="Wrap" Text="13" Canvas.Top="83" Width="34" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="1.882,0.657"/>
-                <TextBox x:Name="minute" FontSize="20" TextWrapping="Wrap" Text="45" Canvas.Left="104" Canvas.Top="83" HorizontalAlignment="Center" VerticalAlignment="Top" Width="30" RenderTransformOrigin="0.194,0.474"/>
+                <TextBox x:Name="minute" FontSize="20" TextWrapping="Wrap" Text="40" Canvas.Left="104" Canvas.Top="83" HorizontalAlignment="Center" VerticalAlignment="Top" Width="30" RenderTransformOrigin="0.194,0.474"/>
                 <Button Content="執行" FontSize="20" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Canvas.Left="2" Canvas.Top="166" Width="155" Click="Button_Run_Click"/>
                 <Label Content="週別:" FontSize="20" HorizontalAlignment="Left" Canvas.Top="40" VerticalAlignment="Top" Canvas.Left="1"/>
                 <ComboBox x:Name="selectPeriodBox" ItemsSource="{Binding Path=Manage.Periods, ElementName=win}" FontSize="20" Canvas.Left="62" Canvas.Top="43" Width="160" HorizontalAlignment="Left" VerticalAlignment="Center"/>

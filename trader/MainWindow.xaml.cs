@@ -27,7 +27,7 @@ namespace trader
 
         private OPS.Transaction OTransaction;
 
-        private OPS.Value OPValue;
+        private OPS.Tick OPValue;
 
         public MainWindow()
         {
@@ -43,7 +43,7 @@ namespace trader
 
             FTransaction = new Futures.Transaction(this.DataPath.Text);
             OTransaction = new OPS.Transaction(this.DataPath.Text);
-            OPValue = new Value(OTransaction, FTransaction);
+            OPValue = new Tick(OTransaction, FTransaction);
 
             this.futuresDataFileDataGrid.ItemsSource = FTransaction.GetFiles();
             this.futures5MinDataFileDataGrid.ItemsSource = FTransaction.Get5MinFiles(opPeriods.SelectedValue.ToString());

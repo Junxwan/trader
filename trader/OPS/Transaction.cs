@@ -105,8 +105,6 @@ namespace trader.OPS
 
                     foreach (KeyValuePair<string, List<Csv.Transaction>> cp in prow.Value)
                     {
-
-
                         if (cp.Value.Count == 0)
                         {
                             continue;

@@ -25,21 +25,6 @@ namespace trader.OPS
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Transaction Transaction
-        {
-            get
-            {
-                return (Transaction)GetValue(TransactionProperty);
-            }
-            set
-            {
-                SetValue(TransactionProperty, value);
-            }
-        }
-
-        public static readonly DependencyProperty TransactionProperty =
-            DependencyProperty.Register("Transaction", typeof(Transaction), typeof(_5minKView));
-
         public Manage Manage
         {
             get
@@ -52,8 +37,17 @@ namespace trader.OPS
             }
         }
 
-        public static readonly DependencyProperty ManageProperty =
-            DependencyProperty.Register("Manage", typeof(Manage), typeof(_5minKView));
+        public Transaction Transaction
+        {
+            get
+            {
+                return (Transaction)GetValue(TransactionProperty);
+            }
+            set
+            {
+                SetValue(TransactionProperty, value);
+            }
+        }
 
         public Futures.Transaction Futures
         {
@@ -67,8 +61,9 @@ namespace trader.OPS
             }
         }
 
-        public static readonly DependencyProperty FuturesProperty =
-            DependencyProperty.Register("Futures", typeof(Futures.Transaction), typeof(_5minKView));
+        private Tick? Tick;
+
+        private Calendar Calendar;
 
         private List<Watch> data = new List<Watch>();
 
@@ -105,16 +100,29 @@ namespace trader.OPS
             }
         }
 
-        private List<VerticalWatchData> verticalWatchData = new List<VerticalWatchData>();
-        public List<VerticalWatchData> VerticalWatchData
+        private List<PriceDiffWatchData> callPriceDiffWatchData = new List<PriceDiffWatchData>();
+        public List<PriceDiffWatchData> CallPriceDiffWatchData
         {
-            get => verticalWatchData;
+            get => callPriceDiffWatchData;
             set
             {
-                verticalWatchData = value;
-                OnPropertyChanged("VerticalWatchData");
+                callPriceDiffWatchData = value;
+                OnPropertyChanged("CallPriceDiffWatchData");
             }
         }
+
+        public static readonly DependencyProperty TransactionProperty =
+            DependencyProperty.Register("Transaction", typeof(Transaction), typeof(_5minKView));
+
+
+        public static readonly DependencyProperty ManageProperty =
+            DependencyProperty.Register("Manage", typeof(Manage), typeof(_5minKView));
+
+
+        public static readonly DependencyProperty FuturesProperty =
+            DependencyProperty.Register("Futures", typeof(Futures.Transaction), typeof(_5minKView));
+
+        private SortedDictionary<int, Csv.Tick> nowData;
 
         public _5minKView()
         {
@@ -126,7 +134,7 @@ namespace trader.OPS
             InitializeComponent();
 
             this.datePicker.SelectedDate = DateTime.Now;
-            this.diffPrices.ItemsSource = new int[] { 50, 100, 150, 200 };
+            this.diffPrices.ItemsSource = new int[] { 50, 100 };
             this.diffPrices.SelectedIndex = 0;
 
             this.selectCP.ItemsSource = new string[] { "call", "put" };
@@ -140,174 +148,142 @@ namespace trader.OPS
             }
         }
 
+        //盤中資料
         public void Load(DateTime date, DateTime time)
         {
-            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
-            var endDateTime = startDateTime.AddHours(5);
-            bool IsDayPlate = (startDateTime > time || time > endDateTime) ? false : true;
+            var period = this.selectPeriodBox.Text;
             var watchs = new List<Watch>();
+            SortedDictionary<int, Csv.Tick> colsePrice = new SortedDictionary<int, Csv.Tick>();
+            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
+            var endDateTime = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, 0);
 
-            if (!IsDayPlate)
+            // 日盤
+            if (time.Hour >= 8 && time.Hour <= 13)
             {
-                //當天夜盤
-                if (time.Hour >= 15 && time.Hour <= 23)
+                colsePrice = this.Tick.GetTime(period, new DateTime(date.Year, date.Month, date.Day, 4, 55, 0));
+            }
+            // 隔日夜盤
+            else if (time.Hour >= 0 && time.Hour <= 4)
+            {
+                startDateTime = startDateTime.AddDays(-1);
+                startDateTime = new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, 15, 0, 0);
+                var y = date.AddDays(-1);
+                colsePrice = this.Tick.GetTime(period, new DateTime(y.Year, y.Month, y.Day, 13, 40, 0));
+            }
+            // 當日夜盤
+            else
+            {
+                startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
+                colsePrice = this.Tick.GetTime(period, new DateTime(date.Year, date.Month, date.Day, 13, 40, 0));
+            }
+
+            var data = this.Tick.GetRange(period, startDateTime, endDateTime);
+            var volume = new Dictionary<int, Dictionary<string, int>>();
+
+            foreach (var item in data)
+            {
+                foreach (var v in item.Values)
                 {
-                    startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
-                    endDateTime = startDateTime.AddHours(14);
-                }
-                else
-                {
-                    endDateTime = new DateTime(date.Year, date.Month, date.Day, 5, 0, 0);
-                    startDateTime = endDateTime.AddHours(-14);
+                    if (!volume.ContainsKey(v.Price))
+                    {
+                        volume[v.Price] = new Dictionary<string, int>();
+                        volume[v.Price]["call"] = 0;
+                        volume[v.Price]["put"] = 0;
+                    }
+
+                    volume[v.Price]["call"] += v.Call_Volume;
+                    volume[v.Price]["put"] += v.Put_Volume;
                 }
             }
 
-            var data = this.Transaction.Get5MinKRange(this.selectPeriodBox.Text, startDateTime, endDateTime);
-            var colsePrice = this.Transaction.GetLast5MinK(this.selectPeriodBox.Text, new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day));
-            var performances = new List<string>();
+            nowData = data.Last();
 
-            foreach (KeyValuePair<string, Dictionary<string, List<Csv.MinPrice>>> row in data)
+            foreach (var k in volume.Keys)
             {
-                int CTotal = 0;
-                int PTotal = 0;
-                double CChange = 0;
-                double PChange = 0;
-                double CPrice = 0;
-                double PPrice = 0;
-
-                foreach (var call in row.Value["call"])
-                {
-                    if (call.DateTime < startDateTime || call.DateTime > endDateTime || call.DateTime > time)
-                    {
-                        continue;
-                    }
-
-                    CChange = Math.Round(call.Close - (colsePrice.ContainsKey(row.Key) ? colsePrice[row.Key]["call"].Close : 0), 2);
-                    CPrice = call.Close;
-                    CTotal += call.Volume;
-                }
-
-                foreach (var put in row.Value["put"])
-                {
-                    if (put.DateTime < startDateTime || put.DateTime > endDateTime || put.DateTime > time)
-                    {
-                        continue;
-                    }
-
-                    PChange = Math.Round(put.Close - (colsePrice.ContainsKey(row.Key) ? colsePrice[row.Key]["put"].Close : 0), 2);
-                    PPrice = put.Close;
-                    PTotal += put.Volume;
-                }
-
                 watchs.Add(new Watch()
                 {
-                    CTotal = CTotal,
-                    PTotal = PTotal,
-                    CChange = CChange,
-                    PChange = PChange,
-                    CPrice = CPrice,
-                    PPrice = PPrice,
-                    Performance = row.Key,
+                    CTotal = volume[k]["call"],
+                    PTotal = volume[k]["put"],
+                    CChange = Math.Round(nowData[k].Call - (colsePrice.ContainsKey(k) ? colsePrice[k].Call : 0), 2),
+                    PChange = Math.Round(nowData[k].Put - (colsePrice.ContainsKey(k) ? colsePrice[k].Put : 0), 2),
+                    CPrice = nowData[k].Call,
+                    PPrice = nowData[k].Put,
+                    Performance = k,
                 });
-
-                performances.Add(row.Key);
             }
 
             this.Data = watchs;
-            this.Performances.ItemsSource = performances;
+            this.Performances.ItemsSource = volume.Keys;
 
-            this.LoadVerticalWatchData();
-        }
-
-        public void LoadFuturesWatch(DateTime date, DateTime time)
-        {
-            var startDateTime = new DateTime(date.Year, date.Month, date.Day, 8, 45, 0);
-            var endDateTime = startDateTime.AddHours(5);
-            bool IsDayPlate = (startDateTime > time || time > endDateTime) ? false : true;
-            if (!IsDayPlate)
+            if (Calendar == null)
             {
-                //當天夜盤
-                if (time.Hour >= 15 && time.Hour <= 23)
-                {
-                    startDateTime = new DateTime(date.Year, date.Month, date.Day, 15, 0, 0);
-                    endDateTime = startDateTime.AddHours(14);
-                }
-                else
-                {
-                    endDateTime = new DateTime(date.Year, date.Month, date.Day, 5, 0, 0);
-                    startDateTime = endDateTime.AddHours(-14);
-                }
+                this.Calendar = new Calendar(Transaction.sourceDir);
             }
 
-            var fw = new FuturesWatch();
-            fw.Name = "台指期";
-            fw.Month = this.selectFuturesPeriodBox.Text.Substring(4, 2);
-            var futures = this.Futures.Get5MinK(date, this.selectFuturesPeriodBox.Text);
-            List<Futures.MinPriceCsv> prevData;
-            DateTime CloseTime;
-
-            foreach (var item in futures)
+            var fk = volume.Keys.ToList()[0];
+            var fw = new FuturesWatch()
             {
-                if (item.DateTime <= time)
-                {
-                    fw.Price = item.Close;
-                }
-            }
-
-            CloseTime = new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, 13, 40, 0);
-            prevData = this.Futures.Get5MinK(new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day), this.selectFuturesPeriodBox.Text);
-
-            foreach (var item in prevData)
-            {
-                if (item.DateTime == CloseTime)
-                {
-                    fw.Change = fw.Price - item.Close;
-                    fw.Increase = Math.Round((fw.Change / item.Close) * 100, 2);
-                    break;
-                }
-            }
+                Name = "台指期",
+                Month = this.Calendar.GetFutures(period),
+                Price = nowData[fk].Futures,
+                Change = nowData[fk].Futures - colsePrice[fk].Futures,
+                Increase = Math.Round(((nowData[fk].Futures - colsePrice[fk].Futures) / colsePrice[fk].Futures) * 100, 2),
+            };
 
             this.FData = new List<FuturesWatch>() { fw };
+
+            this.LoadVerticalWatchData(nowData);
         }
 
-        public void LoadVerticalWatchData()
+        // 價差單
+        public void LoadVerticalWatchData(SortedDictionary<int, Csv.Tick> data)
         {
-            var d = new SortedList<int, Dictionary<string, double>>();
-            var watch = new List<VerticalWatchData>();
             var diff = Convert.ToInt32(this.diffPrices.SelectedValue);
+            var call = new List<PriceDiffWatchData>();
+            var put = new List<PriceDiffWatchData>();
 
-            foreach (var item in this.Data)
+            foreach (var key in data.Keys)
             {
-                var v = new Dictionary<string, double>();
-                v["call"] = item.CPrice;
-                v["put"] = item.PPrice;
-                d[Convert.ToInt32(item.Performance)] = v;
-            }
-
-            foreach (var performance in d.Keys.ToArray())
-            {
-                double call = 0;
-                double put = 0;
-
-                if (d.ContainsKey(performance + diff))
+                var k = key + diff;
+                if (!data.ContainsKey(k))
                 {
-                    call = Math.Round(d[performance]["call"] - d[performance + diff]["call"], 2);
-                    put = Math.Round(d[performance + diff]["put"] - d[performance]["put"], 2);
+                    continue;
                 }
 
-                if (call > 0 || put > 0)
+                call.Add(new PriceDiffWatchData()
                 {
-                    watch.Add(new VerticalWatchData()
-                    {
-                        Call = call,
-                        Put = put,
-                        CPerformance = performance,
-                        PPerformance = performance + diff,
-                    });
-                }
+                    Performance = key,
+                    SB = Math.Round(data[key].Call - data[k].Call, 2),
+                    BS = 0,
+                });
+
+                put.Add(new PriceDiffWatchData()
+                {
+                    Performance = key,
+                    SB = Math.Round(data[key].Put - data[k].Put, 2),
+                    BS = 0,
+                });
             }
 
-            this.VerticalWatchData = watch;
+            this.CallPriceDiffWatchData = call;
+        }
+
+        private void Button_Run_Click(object sender, RoutedEventArgs e)
+        {
+            var date = DateTime.Parse(this.datePicker.Text);
+            var time = new DateTime(
+                date.Year, date.Month, date.Day,
+                Convert.ToInt32(this.hour.Text.Trim()),
+                Convert.ToInt32(this.minute.Text.Trim()),
+                0
+                );
+
+            if (this.Tick == null)
+            {
+                this.Tick = new Tick(Transaction, Futures);
+            }
+
+            this.Load(date, time);
         }
 
         public void LoadDiffPricesChart()
@@ -408,23 +384,12 @@ namespace trader.OPS
             this.DiffPricesChart.Refresh();
         }
 
-        private void Button_Run_Click(object sender, RoutedEventArgs e)
-        {
-            var date = DateTime.Parse(this.datePicker.Text);
-            var time = new DateTime(
-                date.Year, date.Month, date.Day,
-                Convert.ToInt32(this.hour.Text.Trim()),
-                Convert.ToInt32(this.minute.Text.Trim()),
-                0
-                );
-
-            this.LoadFuturesWatch(date, time);
-            this.Load(date, time);
-        }
-
         private void DiffPrices_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.LoadVerticalWatchData();
+            if (nowData != null)
+            {
+                this.LoadVerticalWatchData(nowData);
+            }
         }
 
         private void Performances_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -483,7 +448,7 @@ namespace trader.OPS
         public double PPrice { get; set; }
 
         //履約價
-        public string Performance { get; set; }
+        public int Performance { get; set; }
     }
 
     public class FuturesWatch
@@ -506,16 +471,14 @@ namespace trader.OPS
         public string SPut { get; set; }
     }
 
-    public class VerticalWatchData
+    public class PriceDiffWatchData
     {
-        public double Call { get; set; }
+        //賣高價買低價 C空差 P多差
+        public double SB { get; set; }
 
-        public double Put { get; set; }
+        //買高價賣低價 C多差 P空差
+        public double BS { get; set; }
 
         public int Performance { get; set; }
-
-        public int CPerformance { get; set; }
-
-        public int PPerformance { get; set; }
     }
 }
