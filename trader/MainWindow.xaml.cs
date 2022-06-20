@@ -143,7 +143,7 @@ namespace trader
         {
             var d = DateTime.Parse(this.Date.Text);
             var date = d.ToString("yyyy_MM_dd");
-            var file = this.DataPath.Text + "\\op\\transaction\\OptionsDaily_" + date;        
+            var file = this.DataPath.Text + "\\op\\transaction\\OptionsDaily_" + date;
             ZipFile.ExtractToDirectory(file + ".zip", Directory.GetCurrentDirectory());
             (new OPS.Transaction(this.DataPath.Text)).ToMinPriceCsv(d, Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv", new string[] { this.opPeriods.Text });
             File.Delete(Directory.GetCurrentDirectory() + "\\OptionsDaily_" + date + ".csv");
@@ -154,7 +154,39 @@ namespace trader
         //產生台指 5分K
         private void Button_Futures_TO_5MinK_Click(object sender, RoutedEventArgs e)
         {
-            var date = DateTime.Parse(this.Date.Text).ToString("yyyy_MM_dd");
+            this.CreateFuturesTO5MinK(this.Date.Text);
+            System.Windows.MessageBox.Show("完成");
+        }
+
+        //產生指定周台指 5分K
+        private void Button_WFutures_TO_5MinK_Click(object sender, RoutedEventArgs e)
+        {
+            var c = new Calendar(OTransaction.sourceDir);
+            var st = c.GetFirstDate(this.opPeriods.Text);
+            var et = c.GetEndDate(this.opPeriods.Text);
+
+            for (int i = 0; i < (et - st).TotalDays; i++)
+            {
+                var n = st.AddDays(i);
+                if (n == et)
+                {
+                    break;
+                }
+
+                if (n.DayOfWeek == DayOfWeek.Sunday || n.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    continue;
+                }
+
+                this.CreateFuturesTO5MinK(n.ToString("yyyy-MM-dd"));
+            }
+
+            System.Windows.MessageBox.Show("完成");
+        }
+
+        private void CreateFuturesTO5MinK(string d)
+        {
+            var date = DateTime.Parse(d).ToString("yyyy_MM_dd");
             var file = this.DataPath.Text + "\\futures\\transaction\\Daily_" + date;
 
             if (!File.Exists(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv"))
@@ -164,8 +196,6 @@ namespace trader
 
             (new Futures.Transaction(this.DataPath.Text)).ToMinPriceCsv(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv", this.opPeriods.Text);
             File.Delete(Directory.GetCurrentDirectory() + "\\Daily_" + date + ".csv");
-
-            System.Windows.MessageBox.Show("完成");
         }
 
         //產生台指成本

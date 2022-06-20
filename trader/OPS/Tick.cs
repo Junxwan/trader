@@ -75,7 +75,7 @@ namespace trader.OPS
                         opk[v.DateTime][cp] = v;
                     }
                 }
-                
+
                 foreach (var time in opk.Keys)
                 {
                     Double c = 0;
@@ -93,6 +93,16 @@ namespace trader.OPS
 
                         // 月結只有到25
                         if (time.Minute >= 30 && this.Calendar.GetEndDate(period).Day == dateTime.Day)
+                        {
+                            continue;
+                        }
+
+                        // 有些假日期指沒有資料 2022/05/03 沒有0000-0455
+                        if (opk[time].ContainsKey("put") && opk[time]["put"].Volume == 0)
+                        {
+                            continue;
+                        }
+                        if (opk[time].ContainsKey("call") && opk[time]["call"].Volume == 0)
                         {
                             continue;
                         }

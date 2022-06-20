@@ -51,6 +51,7 @@
                 </DataGrid.Columns>
             </DataGrid>
             <Button Content="產生OP權利金" Canvas.Top="103" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_OP_TO_Value_Click" HorizontalAlignment="Left" VerticalAlignment="Center" Canvas.Left="285"/>
+            <Button Content="產生周台指 5分K" Canvas.Top="72" RenderTransformOrigin="-0.355,-0.285" Height="25" Width="90"  Click="Button_WFutures_TO_5MinK_Click" Canvas.Left="190" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Canvas>
     </DockPanel>
 </Window>
