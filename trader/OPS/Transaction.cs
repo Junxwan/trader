@@ -216,11 +216,22 @@ namespace trader.OPS
                                 startTime = DateTime.Parse(cdata.Key + " 00:00:00");
                                 endTime = startTime.AddHours(13).AddMinutes(45);
 
-                                // 移除0500-0840
-                                removeRange = new int[] {
-                                    (int)(startTime.AddHours(5)-startTime).TotalMinutes/5,
-                                    (int)(startTime.AddHours(8).AddMinutes(45)-startTime.AddHours(5)).TotalMinutes/5,
-                                };
+                                if (startTime.DayOfWeek == DayOfWeek.Monday)
+                                {
+                                    // 移除0000-0840
+                                    removeRange = new int[] {
+                                        0,
+                                        (int)(startTime.AddHours(8).AddMinutes(45)-startTime).TotalMinutes/5,
+                                    };
+                                }
+                                else
+                                {
+                                    // 移除0500-0840
+                                    removeRange = new int[] {
+                                        (int)(startTime.AddHours(5)-startTime).TotalMinutes/5,
+                                        (int)(startTime.AddHours(8).AddMinutes(45)-startTime.AddHours(5)).TotalMinutes/5,
+                                    };
+                                }
                             }
 
                             // 如果沒有開盤資料則用最近一筆

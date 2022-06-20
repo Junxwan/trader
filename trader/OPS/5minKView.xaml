@@ -148,9 +148,9 @@
             <DataGrid Grid.Row="0" ItemsSource="{Binding Path=VerticalHeaders, ElementName=win}"  AutoGenerateColumns="False" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Margin="-6 0 0 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="" Width="40*" Binding="{Binding BCall}"/>
-                    <DataGridTextColumn Header="Call" Width="20*" />
-                    <DataGridTextColumn Header="" Width="40*" Binding="{Binding SPut}"/>
+                    <DataGridTextColumn Header="Call" Width="40*" Binding="{Binding BCall}"/>
+                    <DataGridTextColumn Header="" Width="20*" />
+                    <DataGridTextColumn Header="Put" Width="40*" Binding="{Binding SPut}"/>
                 </DataGrid.Columns>
             </DataGrid>
 
@@ -165,12 +165,12 @@
                 <Border Grid.Column="2" Background="Red"/>
             </Grid>
 
-            <DataGrid Grid.Row="2" x:Name="verticalDataGrid" ItemsSource="{Binding Path=CallPriceDiffWatchData, ElementName=win}" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid Grid.Row="2" x:Name="verticalDataGrid" ItemsSource="{Binding Path=PriceDiffWatchData, ElementName=win}" AutoGenerateColumns="False" IsReadOnly="True"
                           CanUserDeleteRows="False" CanUserAddRows="False" CanUserResizeRows="False" Margin="-6 0 0 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding SB}" />
+                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding C_SB}" />
                     <DataGridTextColumn Header="履約價" Width="25*" Binding="{Binding Performance}"/>
-                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding BS}"/>
+                    <DataGridTextColumn Header="點數" Width="25*" Binding="{Binding P_SB}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -197,8 +197,6 @@
                 <ComboBox x:Name="diffPrices" ItemsSource="{Binding Manage.Periods, ElementName=win}" FontSize="20" Canvas.Left="62" Canvas.Top="115" Width="90" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="DiffPrices_SelectionChanged"/>
                 <ComboBox x:Name="Performances" FontSize="20" Canvas.Left="157" Canvas.Top="115" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="Performances_SelectionChanged"/>
                 <ComboBox x:Name="selectCP" FontSize="20" Canvas.Left="312" Canvas.Top="116" Width="70" SelectionChanged="Performances_SelectionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Label Content="期貨:" FontSize="20" Canvas.Top="39" Canvas.Left="231" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <ComboBox x:Name="selectFuturesPeriodBox" ItemsSource="{Binding Manage.FuturesPeriods, ElementName=win}" FontSize="20" Canvas.Left="292" Canvas.Top="42" Width="160" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Canvas>
         </Grid>
     </Grid>

@@ -100,14 +100,14 @@ namespace trader.OPS
             }
         }
 
-        private List<PriceDiffWatchData> callPriceDiffWatchData = new List<PriceDiffWatchData>();
-        public List<PriceDiffWatchData> CallPriceDiffWatchData
+        private List<PriceDiffWatchData> priceDiffWatchData = new List<PriceDiffWatchData>();
+        public List<PriceDiffWatchData> PriceDiffWatchData
         {
-            get => callPriceDiffWatchData;
+            get => priceDiffWatchData;
             set
             {
-                callPriceDiffWatchData = value;
-                OnPropertyChanged("CallPriceDiffWatchData");
+                priceDiffWatchData = value;
+                OnPropertyChanged("PriceDiffWatchData");
             }
         }
 
@@ -226,8 +226,8 @@ namespace trader.OPS
                 Name = "台指期",
                 Month = this.Calendar.GetFutures(period),
                 Price = nowData[fk].Futures,
-                Change = nowData[fk].Futures - colsePrice[fk].Futures,
-                Increase = Math.Round(((nowData[fk].Futures - colsePrice[fk].Futures) / colsePrice[fk].Futures) * 100, 2),
+                Change = colsePrice.ContainsKey(fk) ? nowData[fk].Futures - colsePrice[fk].Futures : 0,
+                Increase = colsePrice.ContainsKey(fk) ? Math.Round(((nowData[fk].Futures - colsePrice[fk].Futures) / colsePrice[fk].Futures) * 100, 2) : 0,
             };
 
             this.FData = new List<FuturesWatch>() { fw };
@@ -239,8 +239,7 @@ namespace trader.OPS
         public void LoadVerticalWatchData(SortedDictionary<int, Csv.Tick> data)
         {
             var diff = Convert.ToInt32(this.diffPrices.SelectedValue);
-            var call = new List<PriceDiffWatchData>();
-            var put = new List<PriceDiffWatchData>();
+            var watch = new List<PriceDiffWatchData>();
 
             foreach (var key in data.Keys)
             {
@@ -250,22 +249,15 @@ namespace trader.OPS
                     continue;
                 }
 
-                call.Add(new PriceDiffWatchData()
+                watch.Add(new PriceDiffWatchData()
                 {
                     Performance = key,
-                    SB = Math.Round(data[key].Call - data[k].Call, 2),
-                    BS = 0,
-                });
-
-                put.Add(new PriceDiffWatchData()
-                {
-                    Performance = key,
-                    SB = Math.Round(data[key].Put - data[k].Put, 2),
-                    BS = 0,
+                    C_SB = Math.Round(data[key].Call - data[k].Call, 2),
+                    P_SB = Math.Round(data[k].Put - data[key].Put, 2),
                 });
             }
 
-            this.CallPriceDiffWatchData = call;
+            this.PriceDiffWatchData = watch;
         }
 
         private void Button_Run_Click(object sender, RoutedEventArgs e)
@@ -286,103 +278,6 @@ namespace trader.OPS
             this.Load(date, time);
         }
 
-        public void LoadDiffPricesChart()
-        {
-            if (this.selectCP.SelectedValue == null || this.Performances.SelectedValue == null)
-            {
-                return;
-            }
-
-            var date = DateTime.Parse(this.datePicker.Text);
-            var fFates = this.Futures.PriceDates[this.selectFuturesPeriodBox.Text];
-            var data = this.Transaction.Get5MinKRange(this.selectPeriodBox.Text, date.AddDays(-7), date);
-
-            string performance = this.Performances.SelectedValue.ToString();
-            string prevPerformance = (Convert.ToInt32(performance) - Convert.ToInt32(this.diffPrices.Text)).ToString();
-            string nextPerformance = (Convert.ToInt32(performance) + Convert.ToInt32(this.diffPrices.Text)).ToString();
-            var opPrices = new Dictionary<string, SortedList<DateTime, double>>();
-            var cp = this.selectCP.SelectedValue.ToString();
-            var title = "";
-            int buyIndex = 0;
-            List<Csv.MinPrice> sell;
-            List<Csv.MinPrice> buy;
-            opPrices[cp] = new SortedList<DateTime, double>();
-
-            if (cp == "call")
-            {
-                sell = data[performance][cp];
-                buy = data[nextPerformance][cp];
-                title = "買權空差 Sell " + performance + " Buy " + nextPerformance + " 歷史價差";
-            }
-            else
-            {
-                sell = data[performance][cp];
-                buy = data[prevPerformance][cp];
-                title = "賣權多差 Sell " + performance + " Buy " + prevPerformance + " 歷史價差";
-            }
-
-            for (int i = 0; i < sell.Count; i++)
-            {
-                var sellDateTime = sell[i].DateTime;
-
-                for (int ci = buyIndex; ci < buy.Count; ci++)
-                {
-                    buyIndex = ci;
-
-                    if (buy[ci].DateTime.Equals(sellDateTime))
-                    {
-                        opPrices[cp][sellDateTime] = Math.Round(sell[i].Close - buy[ci].Close, 2);
-                        break;
-                    }
-                    else if (buy[ci].DateTime > sellDateTime)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            var fPrices = new List<double>();
-            var fData = this.Futures.Get5MinKRange(this.selectFuturesPeriodBox.Text, date.AddDays(-7), date);
-            var fIndex = 0;
-            foreach (var item in opPrices[cp].Keys)
-            {
-                for (int i = fIndex; i < fData.Count; i++)
-                {
-                    fIndex = i;
-                    if (fData[i].DateTime.Equals(item))
-                    {
-                        fPrices.Add(fData[i].Close);
-                        break;
-                    }
-                    else if (fData[i].DateTime > item)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            this.DiffPricesChart.Plot.Clear();
-            double[] positions = DataGen.Consecutive(opPrices[cp].Count);
-            double[] dates = opPrices[cp].Keys.Select(x => x.ToOADate()).ToArray();
-            var opChart = this.DiffPricesChart.Plot.AddScatter(dates, opPrices[cp].Values.ToArray(), label: cp, color: System.Drawing.Color.Red);
-            opChart.YAxisIndex = 0;
-            opChart.XAxisIndex = 0;
-
-            var futuresChart = this.DiffPricesChart.Plot.AddScatter(dates, fPrices.ToArray(), label: "台指期", color: System.Drawing.Color.Green);
-            futuresChart.YAxisIndex = 1;
-            futuresChart.XAxisIndex = 0;
-
-            this.DiffPricesChart.Plot.YAxis2.Ticks(true);
-            this.DiffPricesChart.Plot.XAxis.ManualTickSpacing(12);
-            this.DiffPricesChart.Plot.XAxis.DateTimeFormat(true);
-            this.DiffPricesChart.Plot.Title(title);
-            this.DiffPricesChart.Plot.Legend();
-            this.DiffPricesChart.Plot.Style(ScottPlot.Style.Gray2);
-            this.DiffPricesChart.Plot.YAxis.Color(System.Drawing.Color.White);
-            this.DiffPricesChart.Plot.YAxis2.Color(System.Drawing.Color.White);
-            this.DiffPricesChart.Plot.XAxis.Color(System.Drawing.Color.White);
-            this.DiffPricesChart.Refresh();
-        }
 
         private void DiffPrices_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -394,8 +289,6 @@ namespace trader.OPS
 
         private void Performances_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.LoadDiffPricesChart();
-
             if (this.selectCP.SelectedValue == null || this.Performances.SelectedValue == null)
             {
                 return;
@@ -473,11 +366,11 @@ namespace trader.OPS
 
     public class PriceDiffWatchData
     {
-        //賣高價買低價 C空差 P多差
-        public double SB { get; set; }
+        // C空差
+        public double C_SB { get; set; }
 
-        //買高價賣低價 C多差 P空差
-        public double BS { get; set; }
+        // P多差
+        public double P_SB { get; set; }
 
         public int Performance { get; set; }
     }

@@ -75,7 +75,7 @@ namespace trader.OPS
                         opk[v.DateTime][cp] = v;
                     }
                 }
-
+                
                 foreach (var time in opk.Keys)
                 {
                     Double c = 0;
@@ -85,6 +85,18 @@ namespace trader.OPS
 
                     if (!fdk.ContainsKey(time))
                     {
+                        // 日盤有些資料會有最後一盤
+                        if (time.Minute == 45)
+                        {
+                            continue;
+                        }
+
+                        // 月結只有到25
+                        if (time.Minute >= 30 && this.Calendar.GetEndDate(period).Day == dateTime.Day)
+                        {
+                            continue;
+                        }
+
                         throw new Exception("缺少" + time.ToString() + "期貨資料");
                     }
 
