@@ -90,7 +90,7 @@ namespace trader.Futures
             double price = 0;
             var data = new List<CostWatch>();
 
-            foreach (var row in this.Transaction.GetCostRange(this.selectPeriodBox.SelectedValue.ToString(), startDateTime, startDateTime.AddDays(30)))
+            foreach (var row in this.Transaction.GetCostRange(this.selectPeriodBox.SelectedValue.ToString(), startDateTime, startDateTime.AddDays(35)))
             {
                 var startTime = DateTime.Parse(row.Key).AddHours(8).AddMinutes(45);
                 var endTime = startTime.AddHours(5);
@@ -109,6 +109,14 @@ namespace trader.Futures
                 c.Price = Math.Round(price / index, 0);
                 index++;
 
+                data.Add(c);
+            }
+
+            if (this.nextNumber.Text != "")
+            {
+                var c = new CostWatch();
+                c.Date = "";
+                c.Price = Math.Round((price + Int32.Parse(this.nextNumber.Text)) / index + 1, 0);
                 data.Add(c);
             }
 

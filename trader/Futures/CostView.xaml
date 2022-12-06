@@ -40,6 +40,7 @@
             <Label Content="開始:" FontSize="20" Canvas.Left="10" Canvas.Top="50" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="0.531,1.554"/>
             <DatePicker x:Name="datePicker" FontSize="20" Canvas.Left="65" Canvas.Top="56" HorizontalAlignment="Left" VerticalAlignment="Center" Width="135"/>
             <ToolBarPanel Height="1080" Width="1536"/>
+            <TextBox x:Name="nextNumber" Canvas.Left="65" TextWrapping="Wrap" Canvas.Top="113" Width="120" FontSize="16"/>
         </Canvas>
     </Grid>
 </UserControl>
